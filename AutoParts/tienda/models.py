@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.contrib.auth.models import AbstractUser 
 # Create your models here.
 
 class Producto(models.Model):
@@ -27,4 +27,6 @@ class Marca(models.Model):
     descripcion = models.CharField(max_length=500)
     logo = models.ImageField(upload_to='logos', blank=True, null=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
-    
+
+class Usuario(AbstractUser):
+    pass
