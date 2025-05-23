@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "crispy_bootstrap5",
     'rest_framework',
     'tienda',
+    'rest_framework.authtoken'
 ]
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
@@ -141,4 +142,4 @@ REST_FRAMEWORK = {
     ]
 }
 
-AUTH_USER_MODEL = 'tienda.Usuario'
+AUTHENTICATION_BACKENDS = ['tienda.authentication.EmailBackend']

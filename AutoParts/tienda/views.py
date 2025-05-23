@@ -24,14 +24,15 @@ class HomeView(APIView):
         return render (request, 'home.html')
 
 class LoginView(APIView):
-    def get (self, request):
-        usuario = request.data.get('usuario')
-        contraseña = request.data.get('contraseña')
-
-        usuario = authenticate(usuario=usuario, contraseña=contraseña)
-        if usuario is not None:
-            token, created = Token.objects.get_or_create(usuario=usuario)
-            return Response({'token':token.key}, status=status.HTTP_200_OK)
+    def post(self, request):  
+        email = request.data.get('usuario')  
+        password = request.data.get('contraseña')
+        if not email or not password:
+            return Response({'error': 'Faltan datos'}, status=status.HTTP_400_BAD_REQUEST)
+        user = authenticate(request, username=email, password=password)
+        if user is not None:
+            token, created = Token.objects.get_or_create(user=user)
+            return Response({'token': token.key}, status=status.HTTP_200_OK)
         return Response({'error': 'Usuario o contraseña incorrectos'}, status=status.HTTP_401_UNAUTHORIZED)
     
 def login_page(request):

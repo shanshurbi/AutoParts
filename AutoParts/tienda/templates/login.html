@@ -36,7 +36,7 @@
       <div class="col-md-6 col-lg-4 mx-auto">  <!-- Centramos la columna -->
         <div class="rounded position-relative fruite-item shadow-sm p-4" style="background: #f8f9fa;">
         <h3 class="mb-4 text-center">Iniciar sesión</h3>
-    <form method="POST" action="{% url 'login' %}">
+    <form method="POST" id="login-form">
       {% csrf_token %}
       
       <input 
@@ -86,5 +86,35 @@
 
     {% include "base/footer.html" %}
 
+    <script>
+      document.getElementById("login-form").addEventListener("submit", async function(e) {
+        e.preventDefault();
+      
+        const email = document.querySelector('input[name="username"]').value;
+        const password = document.querySelector('input[name="password"]').value;
+      
+        const response = await fetch("/api/login/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": "{{ csrf_token }}" // opcional si usas csrf
+          },
+          body: JSON.stringify({
+            usuario: email,
+            contraseña: password
+          })
+        });
+      
+        const data = await response.json();
+      
+        if (response.ok) {
+          localStorage.setItem("token", data.token);
+          alert("Login exitoso");
+          window.location.href = "{% url 'home' %}";  // cambia a la ruta de tu panel
+        } else {
+          alert(data.error);
+        }
+      });
+      </script>
 </body>
 </html>
