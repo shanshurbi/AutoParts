@@ -33,3 +33,6 @@ class LoginView(APIView):
             token, created = Token.objects.get_or_create(usuario=usuario)
             return Response({'token':token.key}, status=status.HTTP_200_OK)
         return Response({'error': 'Usuario o contraseña incorrectos'}, status=status.HTTP_401_UNAUTHORIZED)
+    
+def login_page(request):
+    return render(request, 'login.html')
