@@ -2,17 +2,6 @@ from django.contrib.auth.models import User
 from django.db import models
 
 # Create your models here.
-
-class Producto(models.Model):
-    nombre = models.CharField(max_length=100)
-    precio = models.PositiveIntegerField()
-    descripcion = models.CharField(max_length=500)
-    stock =  models.PositiveIntegerField()
-    marca = models.CharField(max_length=50, null=True, blank=True)
-    fecha_creacion = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return self.nombre
     
 class Categoria(models.Model):
     nombre = models.CharField(max_length=100)
@@ -28,3 +17,39 @@ class Marca(models.Model):
     descripcion = models.CharField(max_length=500)
     logo = models.ImageField(upload_to='logos', blank=True, null=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.nombre
+
+
+class Producto(models.Model):
+    nombre = models.CharField(max_length=100)
+    precio = models.PositiveIntegerField()
+    descripcion = models.CharField(max_length=500)
+    stock =  models.PositiveIntegerField()
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    marca = models.ManyToManyField(Marca, related_name='productos')
+    categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE, related_name='productos')
+
+    def __str__(self):
+        return self.nombre
+    
+class Vehiculo(models.Model):
+    producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
+    marca = models.ForeignKey(Marca, on_delete=models.CASCADE)
+    modelo_auto = models.CharField(max_length=100)
+    año_desde = models.IntegerField()
+    año_hasta = models.IntegerField()
+
+    def __str__(self):
+        return f"{self.producto.nombre} - {self.marca.nombre} {self.modelo_auto} ({self.año_desde}-{self.año_hasta})"
+    
+class Cliente(models.Model):
+    usuario = models.OneToOneField(User, on_delete=models.CASCADE)
+    telefono = models.CharField(max_length=20, blank=True)
+    direccion = models.TextField(blank=True)
+
+class Carrito(models.Model):
+    cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
+    creado = models.DateTimeField(auto_now_add=True)
+

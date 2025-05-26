@@ -2,11 +2,17 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.authtoken.models import Token
+from rest_framework.generics import ListAPIView
 
 from django.shortcuts import render
 from django.contrib.auth import authenticate
-from .models import Producto
-from .serializers import ProductoSerializer
+from django_filters.rest_framework import DjangoFilterBackend
+
+from .models import Producto, Vehiculo, Categoria
+from .serializers import ProductoSerializer, VehiculoSerializer
+from .filters import ProductoFiltro
+
+
 # Create your views here.
 
 def lista_productos(request):
@@ -37,3 +43,23 @@ class LoginView(APIView):
     
 def login_page(request):
     return render(request, 'login.html')
+
+class VehiculoView(APIView):
+    def get(self, request):
+        compatibles = Vehiculo.objects.all()
+        serializer = VehiculoSerializer(compatibles, many=True)
+        return Response(serializer.data)
+    
+def catalogo_view(request):
+    categoria_id = request.GET.get('categoria')
+
+    productos = Producto.objects.all()
+    if categoria_id:
+        productos = productos.filter(categoria_id=categoria_id)
+
+    categorias = Categoria.objects.all()
+
+    return render(request, 'catalogo.html', {
+        'productos': productos,
+        'categorias': categorias,
+    })
