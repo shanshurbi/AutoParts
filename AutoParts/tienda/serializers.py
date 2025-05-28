@@ -2,6 +2,9 @@ from rest_framework import serializers
 from .models import Producto, Marca, Categoria, Vehiculo, Cliente, Carrito
 
 class ProductoSerializer(serializers.ModelSerializer):
+    marca = serializers.StringRelatedField(many=True)
+    categoria = serializers.StringRelatedField()
+    
     class Meta: 
         model = Producto
         fields = '__all__'
