@@ -1,4 +1,25 @@
+:root {
+  --bs-primary: #aa0909;
+  --bs-secondary: #444344;
+}
 
+.text-primary {
+  color: #aa0909 !important;
+  border-color: aliceblue;
+  border-radius: 10ch;
+  border-width: 4ch;
+}
+
+.text-secondary {
+  color: #6e4fc2 !important
+}
+
+
+
+.custom-header{
+    background-color: #444344 !important;
+
+}
 /*** Spinner Start ***/
 #spinner {
     opacity: 0;
@@ -495,3 +516,6 @@
 }
 /*** Footer End ***/
 
+:root {
+  --bs-success: #aa0909;
+}
