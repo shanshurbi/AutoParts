@@ -2,19 +2,18 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.authtoken.models import Token
-from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.authentication import TokenAuthentication
 
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
-from django_filters.rest_framework import DjangoFilterBackend
+from django.http import JsonResponse
 
-from .models import Producto, Vehiculo, Categoria
+from .models import Producto, Vehiculo, Categoria, Carrito, CarritoItem
 from .serializers import ProductoSerializer, VehiculoSerializer
-from .filters import ProductoFiltro
 
+import re
 
 # Create your views here.
 
@@ -98,6 +97,10 @@ class RegistroView(APIView):
             return Response({'error': 'Usuario ya existte'}, status=status.HTTP_400_BAD_REQUEST)
         if User.objects.filter(email=email).exists():
             return Response({'error': 'El correo electrónico ya está en uso'}, status=status.HTTP_400_BAD_REQUEST)
+        if not re.search(r'[A-Z]', password):
+            return Response({'error': 'La contraseña debe contener al menos una letra mayúscula'}, status=status.HTTP_400_BAD_REQUEST)
+        if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
+            return Response({'error': 'La contraseña debe contener al menos un símbolo'}, status=status.HTTP_400_BAD_REQUEST)
         
         user = User.objects.create_user(username=username, password=password, email=email)
         token = Token.objects.create(user=user)
@@ -121,3 +124,101 @@ class PerfilUsuarioView(APIView):
 
 def perfil_page(request):
     return render(request, 'perfil.html')
+
+def detalle_producto(request, producto_id):
+    producto = get_object_or_404(Producto, id=producto_id)
+    return render(request, 'detalle.html', {'producto': producto})
+
+class CarritoView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        try:
+            carrito = Carrito.objects.get(user=request.user, is_active=True)
+            items = CarritoItem.objects.filter(carrito=carrito)
+            data = [
+                {
+                    "producto": item.producto.nombre,
+                    "cantidad": item.cantidad,
+                    "precio": item.producto.precio,
+                }
+                for item in items
+            ]
+            return Response({"carrito": data})
+        except Carrito.DoesNotExist:
+            return Response({"carrito": []})
+
+class AgregarCarritoView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        producto_id = request.data.get('producto_id')
+        cantidad = request.data.get('cantidad', 1)
+
+        if not producto_id:
+            return Response({'error': 'Falta producto_id'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            producto = Producto.objects.get(id=producto_id)
+        except Producto.DoesNotExist:
+            return Response({'error': 'Producto no encontrado'}, status=status.HTTP_404_NOT_FOUND)
+        
+        carrito, created = Carrito.objects.get_or_create(user=user, is_active=True)
+
+        carrito_item, created = CarritoItem.objects.get_or_create(carrito=carrito, producto=producto)
+        if not created:
+            carrito_item.cantidad += int(cantidad)
+            carrito_item.save()
+        
+        return Response({'message': 'Producto agregado al carrito'}, status=status.HTTP_200_OK)
+    
+class RemoverDelCarritoView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, producto_id):  # <- ahora viene desde la URL
+        user = request.user
+
+        try:
+            carrito = Carrito.objects.get(user=user, is_active=True)
+        except Carrito.DoesNotExist:
+            return Response({'error': 'No tienes un carrito activo'}, status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            item = CarritoItem.objects.get(carrito=carrito, producto_id=producto_id)
+        except CarritoItem.DoesNotExist:
+            return Response({'error': 'El producto no está en el carrito'}, status=status.HTTP_404_NOT_FOUND)
+
+        if item.cantidad > 1:
+            item.cantidad -= 1
+            item.save()
+        else:
+            item.delete()
+
+        return redirect('carrito')
+    
+def carrito_page(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+
+    try:
+        carrito = Carrito.objects.get(user=request.user, is_active=True)
+        carrito_items = CarritoItem.objects.filter(carrito=carrito)
+    except Carrito.DoesNotExist:
+        carrito_items = []
+
+    return render(request, 'carrito.html', {
+        'carrito_items': carrito_items
+    })
+
+class CarritoContadorView(APIView):
+    def get(self, request):
+        if not request.user.is_authenticated:
+            return JsonResponse({'count': 0})
+        
+        carrito = Carrito.objects.filter(user=request.user, is_active=True).first()
+        if not carrito:
+            return JsonResponse({'count': 0})
+        
+        count = sum(item.cantidad for item in CarritoItem.objects.filter(carrito=carrito))
+        return JsonResponse({'count':count})

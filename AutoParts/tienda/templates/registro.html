@@ -38,27 +38,16 @@
             {% csrf_token %}
 
             <input 
-                class="form-control border-2 border-secondary w-100 py-3 px-4 rounded-pill mb-3" 
-                type="text" 
-                name="username" 
-                placeholder="Usuario" 
-                required 
+              class="form-control border-2 border-secondary w-100 py-3 px-4 rounded-pill mb-3" type="text" name="username" placeholder="Usuario" required
             />
-
             <input 
-                class="form-control border-2 border-secondary w-100 py-3 px-4 rounded-pill mb-3" 
-                type="email" 
-                name="email" 
-                placeholder="Correo electrónico" 
-                required 
+              class="form-control border-2 border-secondary w-100 py-3 px-4 rounded-pill mb-3" type="email" name="email" placeholder="Correo electrónico" required 
             />
-
             <input 
-                class="form-control border-2 border-secondary w-100 py-3 px-4 rounded-pill mb-4" 
-                type="password" 
-                name="password" 
-                placeholder="Contraseña" 
-                required 
+            class="form-control border-2 border-secondary w-100 py-3 px-4 rounded-pill mb-4" type="password" name="password" placeholder="Contraseña" required 
+            />
+            <input
+            class="form-control border-2 border-secondary w-100 py-3 px-4 rounded-pill mb-4" type="password" name="password_confirm" placeholder="Confirmar contraseña" required 
             />
 
             <div class="d-flex justify-content-between">
@@ -70,6 +59,7 @@
                 Registrar
             </div>
             </form>
+            <div id="mensaje-error" style="color: red; margin-bottom: 1rem; display: none;"></div>
         </div>
         </div>
     </div>
@@ -78,34 +68,56 @@
     {% include "base/footer.html" %}
     <script>
   document.getElementById("register-form").addEventListener("submit", async function(e) {
-    e.preventDefault();
+  e.preventDefault();
 
-    const username = document.querySelector('input[name="username"]').value;
-    const email = document.querySelector('input[name="email"]').value;
-    const password = document.querySelector('input[name="password"]').value;
+  const mensajeError = document.getElementById("mensaje-error");
+  mensajeError.style.display = "none";
+  mensajeError.textContent = "";
 
-    const response = await fetch("/api/registro/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-CSRFToken": "{{ csrf_token }}"
-      },
-      body: JSON.stringify({
-        usuario: username,
-        email: email,
-        contraseña: password
-      })
-    });
+  const username = document.querySelector('input[name="username"]').value.trim();
+  const email = document.querySelector('input[name="email"]').value.trim();
+  const password = document.querySelector('input[name="password"]').value;
+  const passwordConfirm = document.querySelector('input[name="password_confirm"]').value;
 
-    const data = await response.json();
+  if (password !== passwordConfirm) {
+    mensajeError.textContent = "Las contraseñas no coinciden.";
+    mensajeError.style.display = "block";
+    return;
+  }
 
-    if (response.ok) {
-      localStorage.setItem("token", data.token);
-      window.location.href = "{% url 'home' %}";
-    } else {
-      alert(data.error);
-    }
+  const hasUppercase = /[A-Z]/.test(password);
+  const hasSymbol = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+  if (!hasUppercase || !hasSymbol) {
+    mensajeError.textContent = "La contraseña debe contener al menos una letra mayúscula y un símbolo.";
+    mensajeError.style.display = "block";
+    return;
+  }
+
+  const response = await fetch("/api/registro/", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRFToken": "{{ csrf_token }}"
+    },
+    body: JSON.stringify({
+      usuario: username,
+      email: email,
+      contraseña: password,
+      contraseña_confirm: passwordConfirm  // IMPORTANTE: envía también el confirm
+    })
   });
+
+  const data = await response.json();
+
+  if (response.ok) {
+    localStorage.setItem("token", data.token);
+    window.location.href = "{% url 'home' %}";
+  } else {
+    mensajeError.textContent = data.error || "Error desconocido";
+    mensajeError.style.display = "block";
+  }
+});
 </script>
 
 

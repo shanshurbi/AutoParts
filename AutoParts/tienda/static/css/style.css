@@ -17,7 +17,7 @@
 
 
 .custom-header{
-    background-color: #444344 !important;
+    background-color: #d3d3d3 !important;
 
 }
 /*** Spinner Start ***/
@@ -319,21 +319,27 @@
 }
 
 .fruite .fruite-item {
-    height: 100%;
-    transition: 0.5s;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 420px; /* Ajusta según tu diseño */
 }
 .fruite .fruite-item:hover {
     box-shadow: 0 0 55px rgba(0, 0, 0, 0.4);
 }
 
 .fruite .fruite-item .fruite-img {
-    overflow: hidden;
-    transition: 0.5s;
-    border-radius: 10px 10px 0 0;
+  height: 200px; /* Altura fija para contenedor de imagen */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .fruite .fruite-item .fruite-img img {
-    transition: 0.5s;
+  height: 100%;
+  width: 100%;
+  object-fit: cover; /* Recorta imagen para que se ajuste sin deformarse */
+  border-radius: 10px 10px 0 0;
 }
 
 .fruite .fruite-item .fruite-img img:hover {

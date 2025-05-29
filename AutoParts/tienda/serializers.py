@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Producto, Marca, Categoria, Vehiculo, Cliente, Carrito
+from .models import Producto, Marca, Categoria, Vehiculo, Carrito, CarritoItem
 
 class ProductoSerializer(serializers.ModelSerializer):
     marca = serializers.StringRelatedField(many=True)
@@ -26,3 +26,17 @@ class VehiculoSerializer(serializers.Serializer):
     class Meta:
         model = Vehiculo
         fields = '__all__'
+
+class CarritoItemSerializer(serializers.ModelSerializer):
+    producto = ProductoSerializer(read_only=True)
+
+    class Meta:
+        model = CarritoItem
+        fields = ['id', 'producto', 'cantidad']
+
+class CarritoSerializer(serializers.ModelSerializer):
+    items = CarritoItemSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Carrito
+        fields = ['id', 'user', 'is_active', 'items']
