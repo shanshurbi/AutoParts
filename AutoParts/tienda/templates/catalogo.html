@@ -290,30 +290,29 @@
             cargarProductos();
         });
         function agregarAlCarrito(productoId) {
-        fetch('/carrito/agregar/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCSRFToken(),
-            },
-            body: JSON.stringify({ producto_id: productoId }),
-            credentials: 'include'
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.error === 'No autenticado') {
-                window.location.href = '/login/';
-            } else if (data.error) {
-                alert(data.error);
-            } else {
-                alert('Producto agregado al carrito');
-                actualizarContadorCarrito();
-            }
-        })
-        .catch(err => {
-            console.error("Error:", err);
-            alert('Error al agregar producto');
-        });
+            fetch('/carrito/agregar/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Token ' + localStorage.getItem('token')
+                },
+                body: JSON.stringify({ producto_id: productoId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error === 'No autenticado') {
+                    window.location.href = '/login/';
+                } else if (data.error) {
+                    alert(data.error);
+                } else {
+                    alert('Producto agregado al carrito');
+                    actualizarContadorCarrito();
+                }
+            })
+            .catch(err => {
+                console.error("Error:", err);
+                alert('Error al agregar producto');
+            });
         }
         function mostrarNotificacion(mensaje, tipo = 'success') {
         const notif = document.createElement('div');

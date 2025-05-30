@@ -3,10 +3,10 @@ from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework.authentication import TokenAuthentication
+from rest_framework.authentication import TokenAuthentication, SessionAuthentication
 
 from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from django.http import JsonResponse
 
@@ -133,21 +133,18 @@ class CarritoView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        try:
-            carrito = Carrito.objects.get(user=request.user, is_active=True)
-            items = CarritoItem.objects.filter(carrito=carrito)
-            data = [
-                {
-                    "producto": item.producto.nombre,
-                    "cantidad": item.cantidad,
-                    "precio": item.producto.precio,
-                }
-                for item in items
-            ]
-            return Response({"carrito": data})
-        except Carrito.DoesNotExist:
-            return Response({"carrito": []})
-
+        carrito, created = Carrito.objects.get_or_create(user=request.user, is_active=True)
+        items = CarritoItem.objects.filter(carrito=carrito)
+        data = [
+            {
+                "producto": item.producto.nombre,
+                "cantidad": item.cantidad,
+                "precio": item.producto.precio,
+            }
+            for item in items
+        ]
+        return Response({"carrito": data})
+    
 class AgregarCarritoView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -174,15 +171,12 @@ class AgregarCarritoView(APIView):
         return Response({'message': 'Producto agregado al carrito'}, status=status.HTTP_200_OK)
     
 class RemoverDelCarritoView(APIView):
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def post(self, request, producto_id):  # <- ahora viene desde la URL
+    def post(self, request, producto_id):
         user = request.user
-
-        try:
-            carrito = Carrito.objects.get(user=user, is_active=True)
-        except Carrito.DoesNotExist:
-            return Response({'error': 'No tienes un carrito activo'}, status=status.HTTP_404_NOT_FOUND)
+        carrito, created = Carrito.objects.get_or_create(user=user, is_active=True)
 
         try:
             item = CarritoItem.objects.get(carrito=carrito, producto_id=producto_id)

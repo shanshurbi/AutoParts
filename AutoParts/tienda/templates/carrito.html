@@ -67,6 +67,67 @@
         <a href="{% url 'catalogo' %}" class="btn btn-primary">Ir al catálogo</a>
     {% endif %}
     </div>  
+
+
+
+    
+    <script>
+  document.addEventListener("DOMContentLoaded", async function () {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      window.location.href = "{% url 'login' %}";
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/carrito/", {
+        headers: {
+          "Authorization": "Token " + token
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error("Token inválido o expirado");
+      }
+
+      const data = await response.json();
+      const carritoItems = data.carrito;
+
+      const tbody = document.querySelector("tbody");
+      tbody.innerHTML = "";
+
+      if (carritoItems.length === 0) {
+        document.querySelector(".container").innerHTML = `
+          <p>No tienes productos en tu carrito.</p>
+          <a href="{% url 'catalogo' %}" class="btn btn-primary">Ir al catálogo</a>
+        `;
+        return;
+      }
+
+      carritoItems.forEach(item => {
+        const fila = document.createElement("tr");
+        fila.innerHTML = `
+          <td>${item.producto}</td>
+          <td>$${item.precio}</td>
+          <td>${item.cantidad}</td>
+          <td>$${(item.precio * item.cantidad).toFixed(2)}</td>
+          <td>
+            <form method="post" action="/carrito/remover/${item.id}/">
+              <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+              <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+            </form>
+          </td>
+        `;
+        tbody.appendChild(fila);
+      });
+
+    } catch (error) {
+      localStorage.removeItem("token");
+      window.location.href = "{% url 'login' %}";
+    }
+  });
+</script>
     {% include "base/footer.html" %}
 </body>
 </html>

@@ -107,13 +107,13 @@
       });
 
       const data = await response.json();
-      console.log(data); // <--- Aquí ves qué llega en data
+      console.log(data); 
 
       if (response.ok) {
         localStorage.setItem("token", data.token);
         window.location.href = "{% url 'home' %}";
       } else {
-        alert(data.error || 'Error desconocido'); // Por si no llega error, evitar undefined
+        alert(data.error || 'Error desconocido'); 
       }
     });
       </script>
