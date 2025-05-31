@@ -172,16 +172,25 @@ class AgregarCarritoView(APIView):
         return Response({'message': 'Producto agregado al carrito'}, status=status.HTTP_200_OK)
     
 class RemoverDelCarritoView(APIView):
-    authentication_classes = [TokenAuthentication, SessionAuthentication]
     permission_classes = [IsAuthenticated]
 
     def post(self, request, producto_id):
         user = request.user
+
         carrito, created = Carrito.objects.get_or_create(user=user, is_active=True)
+
+        print("=== DEBUG ELIMINAR PRODUCTO DEL CARRITO ===")
+        print("Usuario autenticado:", user.username)
+        print("Producto ID recibido:", producto_id)
+        print("Carrito ID:", carrito.id)
+        print("Items en el carrito del usuario:")
+        for item in CarritoItem.objects.filter(carrito=carrito):
+            print(f" - Producto ID: {item.producto.id}, Nombre: {item.producto.nombre}, Cantidad: {item.cantidad}")
 
         try:
             item = CarritoItem.objects.get(carrito=carrito, producto_id=producto_id)
         except CarritoItem.DoesNotExist:
+            print("⚠️ Producto no encontrado en el carrito del usuario.")
             return Response({'error': 'El producto no está en el carrito'}, status=status.HTTP_404_NOT_FOUND)
 
         if item.cantidad > 1:
