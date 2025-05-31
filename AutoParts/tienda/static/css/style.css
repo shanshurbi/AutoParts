@@ -1,11 +1,10 @@
-
 :root {
-  --bs-primary: #aa0909;
+  --bs-primary: #780000;
   --bs-secondary: #444344;
 }
 
 .text-primary {
-  color: #aa0909 !important;
+  color: #780000 !important;
   border-color: aliceblue;
   border-radius: 10ch;
   border-width: 4ch;
@@ -44,7 +43,7 @@
 }
 
 .custom-header{
-    background-color: #ffdede !important;
+    background-color: #003049 !important;
 
 }
 /*** Spinner Start ***/
@@ -170,6 +169,11 @@
     font-size: 16px;
     transition: .5s;
 }
+
+.navbar .nav-link {
+    color: white !important;
+}
+
 
 .navbar {
     height: 100px;
