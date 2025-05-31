@@ -1,3 +1,4 @@
+{% load static %}
 <header>
     <div class="fixed-header-container">
     <div class="container-fluid fixed-top">
@@ -25,7 +26,9 @@
             </div>
             <div class="container-fluid px-0" style="margin-top: 2px;">
                 <nav class="navbar navbar-light custom-header  navbar-expand-xl" style="padding: 2em;">
-                    <a href="{% url 'home' %}" class="navbar-brand"><h1 class="text-primary display-6">AutoParts</h1></a>
+            <a href="{% url 'home' %}" class="navbar-brand">
+                <img src="{% static 'img/Logo-autoparts.png' %}" alt="AutoParts" style="height: 130px;">
+            </a>
                     <button class="navbar-toggler py-2 px-3" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
                         <span class="fa fa-bars text-primary"></span>
                     </button>
