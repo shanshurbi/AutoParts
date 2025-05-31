@@ -12,45 +12,52 @@
           </div>
           <div class="col-lg-6 text-end">
             <div class="d-flex justify-content-end">
-              <a class="btn btn-outline-light me-2 rounded-circle" href="#"><i class="fab fa-facebook-f"></i></a>
-              <a class="btn btn-outline-light me-2 rounded-circle" href="#"><i class="fab fa-instagram"></i></a>
-              <a class="btn btn-outline-light me-2 rounded-circle" href="#"><i class="fab fa-linkedin-in"></i></a>
+<a class="btn btn-outline-light me-2 rounded-circle" href="https://wa.me/56946904800" target="_blank">
+  <i class="fab fa-whatsapp"></i>
+</a>
+
+<a class="btn btn-outline-light me-2 rounded-circle" href="https://www.instagram.com/carla.kookie/" target="_blank">
+  <i class="fab fa-instagram"></i>
+</a>
+
+<a class="btn btn-outline-light me-2 rounded-circle" href="https://www.tiktok.com/@admisionduocuc" target="_blank">
+  <i class="fab fa-tiktok"></i>
+</a>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="row g-5">
-        <div class="col-md-4">
-          <h5 class="text-light mb-3">Navegación</h5>
-          <ul class="list-unstyled">
-            <li><a class="text-white-50" href="{% url 'home' %}">Inicio</a></li>
-            <li><a class="text-white-50" href="{% url 'home' %}">Catálogo</a></li>
-            <li><a class="text-white-50" href="{% url 'home' %}">Contacto</a></li>
-            <li><a class="text-white-50" href="{% url 'home' %}">Preguntas Frecuentes</a></li>
-          </ul>
-        </div>
-
-        <div class="col-md-4">
-          <h5 class="text-light mb-3">Mi cuenta</h5>
-          <ul class="list-unstyled">
-            <li><a class="text-white-50" href="{% url 'home' %}">Iniciar sesión</a></li>
-            <li><a class="text-white-50" href="{% url 'home' %}">Mi carrito</a></li>
-            <li><a class="text-white-50" href="{% url 'home' %}">Mis pedidos</a></li>
-          </ul>
-        </div>
-
-        <div class="col-md-4">
-          <h5 class="text-light mb-3">Contacto</h5>
-          <p class="mb-1">📍 Santiago, Chile</p>
-          <p class="mb-1">✉ contacto@autoparts.cl</p>
-          <p class="mb-1">📞 +56 9 1234 5678</p>
-          <img src="{% static 'img/payment.png' %}" class="img-fluid mt-2" alt="Medios de pago">
-        </div>
-      </div>
-    </div>
+<!-- Footer Links -->
+<div class="row g-5">
+  <div class="col-md-4">
+    <h5 class="text-light mb-3">Navegación</h5>
+    <ul class="list-unstyled">
+      <li><a class="text-white-50" href="{% url 'home' %}">Inicio</a></li>
+      <li><a class="text-white-50" href="{% url 'catalogo' %}">Catálogo</a></li>
+      <li><a class="text-white-50" href="{% url 'login' %}">Contacto</a></li>  <!-- Si no tienes contacto real, puede apuntar al login o eliminar -->
+      <!-- Si agregas más páginas después, puedes usar Preguntas Frecuentes aquí -->
+    </ul>
   </div>
 
+  <div class="col-md-4">
+    <h5 class="text-light mb-3">Mi cuenta</h5>
+    <ul class="list-unstyled">
+      <li><a class="text-white-50" href="{% url 'login' %}">Iniciar sesión</a></li>
+      <li><a class="text-white-50" href="/carrito/">Mi carrito</a></li>
+      <!-- "Mis pedidos" aún no existe, así que podrías dejarlo comentado o quitarlo por ahora -->
+      <!-- <li><a class="text-white-50" href="#">Mis pedidos</a></li> -->
+    </ul>
+  </div>
+
+  <div class="col-md-4">
+    <h5 class="text-light mb-3">Contacto</h5>
+    <p class="mb-1">📍 Diez de Julio 525, Santiago</p>
+    <p class="mb-1">✉ contacto@autoparts.cl</p>
+    <p class="mb-1">📞 +56 9 1234 5678</p>
+    <img src="{% static 'img/payment.png' %}" class="img-fluid mt-2" alt="Medios de pago">
+  </div>
+</div>
   <div class="container-fluid bg-black text-center text-white py-3">
     <small>&copy; {{ year|default:"2025" }} AutoParts. Todos los derechos reservados.</small>
   </div>

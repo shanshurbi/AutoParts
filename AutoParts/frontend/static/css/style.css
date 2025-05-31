@@ -3,6 +3,10 @@
   --bs-secondary: #444344;
 }
 
+.text-blanco-suave {
+  color: #FDF0D5 !important;
+}
+
 .text-primary {
   color: #780000 !important;
   border-color: aliceblue;
@@ -46,6 +50,96 @@
     background-color: #003049 !important;
 
 }
+
+.icono-principal {
+  color: #780000 !important;
+}
+/* FIN HEADER ICONOS Y COSAS */
+
+/* INICIO BEST SELEERS MEJORES VENDIDOS NO SÉ */
+/* Fondo de la sección */
+.bg-bestseller-section {
+  background-color: #FDF0D5;
+  position: relative;
+  z-index: 1;
+}
+
+/* Título destacado con línea decorativa */
+.section-title::after {
+  content: "";
+  width: 60px;
+  height: 4px;
+  background-color: #C1121F;
+  display: block;
+  margin: 12px auto 0 auto;
+  border-radius: 2px;
+}
+
+/* Transiciones suaves si deseas animar */
+#bestseller .col-lg-6,
+#bestseller .col-xl-4 {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.5s ease-in-out;
+}
+
+/* Activado luego de carga */
+#bestseller .col-lg-6.loaded,
+#bestseller .col-xl-4.loaded {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Fondo de tarjeta */
+.bg-bestseller {
+  background-color: #FDF0D5 !important;
+}
+
+/* Imagen */
+.bg-bestseller img {
+  border: 3px solid #C1121F;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Estrellas */
+.bg-bestseller .fa-star,
+.bg-bestseller .fa-star-half-alt {
+  color: #669BBC !important;
+}
+
+/* Botón personalizado */
+.btn-bestseller {
+  display: inline-block;
+  background-color: #780000;
+  color: #FDF0D5;
+  border: 2px solid #780000;
+  border-radius: 50px;
+  padding: 8px 16px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.btn-bestseller:hover {
+  background-color: #C1121F;
+  border-color: #C1121F;
+  color: #FDF0D5;
+}
+
+/* Animación hover */
+.card-hover {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+}
+
+/* FIN BEST SELEERS MEJORES VENDIDOS NO SÉ */
+
+
+
 /*** Spinner Start ***/
 #spinner {
     opacity: 0;
@@ -121,6 +215,20 @@
     color: var(--bs-white) !important;
 }
 
+.btn-volver-arriba {
+  background-color: #C1121F;
+  color: #FDF0D5;
+  border: 3px solid #780000;
+  border-radius: 50%;
+  transition: 0.4s;
+}
+
+.btn-volver-arriba:hover {
+  background-color: #780000;
+  color: #FDF0D5;
+  transform: scale(1.1);
+}
+
 /*** Topbar Start ***/
 .fixed-top {
     transition: 0.5s;
@@ -163,74 +271,94 @@
 }
 /*** Topbar End ***/
 
+/* Colores personalizados */
+.icono-principal {
+  color: #780000 !important;
+}
+
+.text-blanco-suave {
+  color: #FDF0D5 !important;
+}
+
 /*** Navbar Start ***/
+
+/* Link principal en nav */
 .navbar .navbar-nav .nav-link {
-    padding: 10px 15px;
-    font-size: 16px;
-    transition: .5s;
+  padding: 10px 15px;
+  font-size: 16px;
+  color: #FDF0D5 !important; /* blanco suave */
+  transition: 0.5s;
 }
 
-.navbar .nav-link {
-    color: white !important;
-}
-
-
-.navbar {
-    height: 100px;
-    border-bottom: 1px solid rgba(255, 255, 255, .1);
-}
-
+/* Hover y activo */
 .navbar .navbar-nav .nav-link:hover,
-.navbar .navbar-nav .nav-link.active,
-.fixed-top.bg-white .navbar .navbar-nav .nav-link:hover,
-.fixed-top.bg-white .navbar .navbar-nav .nav-link.active {
-    color: var(--bs-primary);
+.navbar .navbar-nav .nav-link.active {
+  color: #C1121F !important; /* rojo claro */
+  text-decoration: underline;
+  border-bottom: 2px solid #C1121F;
 }
 
+/* Altura del navbar y línea inferior */
+.navbar {
+  height: 100px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Ícono flechita del dropdown */
 .navbar .dropdown-toggle::after {
-    border: none;
-    content: "\f107";
-    font-family: "Font Awesome 5 Free";
-    font-weight: 700;
-    vertical-align: middle;
-    margin-left: 8px;
+  border: none;
+  content: "\f107";
+  font-family: "Font Awesome 5 Free";
+  font-weight: 700;
+  vertical-align: middle;
+  margin-left: 8px;
 }
 
+/* Dropdown animado en desktop */
 @media (min-width: 1200px) {
-    .navbar .nav-item .dropdown-menu {
-        display: block;
-        visibility: hidden;
-        top: 100%;
-        transform: rotateX(-75deg);
-        transform-origin: 0% 0%;
-        border: 0;
-        transition: .5s;
-        opacity: 0;
-    }
-}
+  .navbar .nav-item .dropdown-menu {
+    display: block;
+    visibility: hidden;
+    top: 100%;
+    transform: rotateX(-75deg);
+    transform-origin: 0% 0%;
+    border: 0;
+    transition: 0.5s;
+    opacity: 0;
+  }
 
-.dropdown .dropdown-menu a:hover {
-    background: var(--bs-secondary);
-    color: var(--bs-primary);
-}
-
-.navbar .nav-item:hover .dropdown-menu {
+  .navbar .nav-item:hover .dropdown-menu {
     transform: rotateX(0deg);
     visibility: visible;
-    background: var(--bs-light) !important;
-    border-radius: 10px !important;
-    transition: .5s;
     opacity: 1;
+    border-radius: 10px !important;
+  }
 }
 
-#searchModal .modal-content {
-    background: rgba(255, 255, 255, .8);
+/*** Dropdown personalizado con tu paleta ***/
+.dropdown-menu {
+  background-color: #003049 !important;
 }
+
+.dropdown-menu .dropdown-item {
+  color: #FDF0D5 !important;
+}
+
+.dropdown-menu .dropdown-item:hover {
+  background-color: #669BBC !important;
+  color: #003049 !important;
+}
+
+/* Modal (por si lo usas) */
+#searchModal .modal-content {
+  background: rgba(255, 255, 255, 0.8);
+}
+
 /*** Navbar End ***/
 
 /*** Hero Header ***/
 .hero-header {
-    background: linear-gradient(rgba(248, 223, 173, 0.1), rgba(248, 223, 173, 0.1)), url(../img/hero-img.jpg);
+    background: linear-gradient(rgba(0, 48, 73, 0.85), rgba(0, 48, 73, 0.85)), url(../img/hero-img.jpg);
     background-position: center center;
     background-repeat: no-repeat;
     background-size: cover;
@@ -290,32 +418,124 @@
         margin-top: 97px !important;
     }
 }
+
+.btn:hover {
+  transform: scale(1.03);
+  background-color: #780000 !important;
+  color: #FDF0D5 !important;
+}
 /*** Hero Header end ***/
 
 
 /*** featurs Start ***/
-.featurs .featurs-item .featurs-icon {
-    position: relative;
-    width: 120px;
-    height: 120px;
+
+/* Fondo de la tarjeta */
+.bg-personalizado {
+  background-color: #FDF0D5 !important;
 }
 
+/* Círculo del ícono */
+.bg-icono {
+  background-color: #780000 !important;
+}
+
+/* Colores de texto */
+.text-azul {
+  color: #003049 !important;
+}
+
+.text-celeste {
+  color: #669BBC !important;
+}
+
+/* Estilos del círculo del ícono */
+.featurs .featurs-item .featurs-icon {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  background-color: #780000 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+/* Flechita decorativa debajo del círculo */
 .featurs .featurs-item .featurs-icon::after {
-    content: "";
-    width: 35px;
-    height: 35px;
-    background: var(--bs-secondary);
-    position: absolute;
-    bottom: -10px;
-    transform: translate(-50%);
-    transform: rotate(45deg);
-    background: var(--bs-secondary);
-    
+  content: "";
+  width: 35px;
+  height: 35px;
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+  background: #780000;
+  z-index: -1;
+}
+
+.featurs-item {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.featurs-item:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
 }
 /*** featurs End ***/
 
 
 /*** service Start ***/
+/* Fondo principal de la tarjeta */
+.bg-oferta {
+  background-color: #FDF0D5 !important;
+}
+
+/* Borde rojo oscuro */
+.border-rojo {
+  border: 2px solid #780000 !important;
+}
+
+/* Fondo interior destacado */
+.bg-destacado {
+  background-color: #C1121F !important;
+}
+
+/* Hover suave para toda la tarjeta */
+.service-item {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.service-item:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.2);
+}
+
+/* Texto promocional */
+.service-content h5, 
+.service-content h3 {
+  color: #FDF0D5 !important;
+  font-weight: bold;
+}
+
+/* Animación de rebote */
+@keyframes bounce {
+  0%   { transform: translateY(0); }
+  30%  { transform: translateY(-8px); }
+  50%  { transform: translateY(4px); }
+  70%  { transform: translateY(-4px); }
+  100% { transform: translateY(0); }
+}
+
+/* Efecto cuando se hace hover en la tarjeta */
+.service-item:hover h3 {
+  animation: bounce 0.6s ease;
+}
+
+/* Cambio de borde al pasar el mouse */
+.service-item:hover {
+  border-color: #C1121F !important; /* rojo claro */
+}
+
 .service .service-item .service-content {
     position: relative;
     width: 250px; 
@@ -326,121 +546,6 @@
 }
 
 /*** service End ***/
-
-
-/*** Fruits Start ***/
-.fruite .tab-class .nav-item a.active {
-    background: var(--bs-secondary) !important;
-}
-
-.fruite .tab-class .nav-item a.active span {
-    color: var(--bs-white) !important; 
-}
-
-.fruite .fruite-categorie .fruite-name {
-    line-height: 40px;
-}
-
-.fruite .fruite-categorie .fruite-name a {
-    transition: 0.5s;
-}
-
-.fruite .fruite-categorie .fruite-name a:hover {
-    color: var(--bs-secondary);
-}
-
-.fruite .fruite-item {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  min-height: 420px; /* Ajusta según tu diseño */
-}
-.fruite .fruite-item:hover {
-    box-shadow: 0 0 55px rgba(0, 0, 0, 0.4);
-}
-
-.fruite .fruite-item .fruite-img {
-  height: 200px; /* Altura fija para contenedor de imagen */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.fruite .fruite-item .fruite-img img {
-  height: 100%;
-  width: 100%;
-  object-fit: cover; /* Recorta imagen para que se ajuste sin deformarse */
-  border-radius: 10px 10px 0 0;
-}
-
-.fruite .fruite-item .fruite-img img:hover {
-    transform: scale(1.3);
-}
-/*** Fruits End ***/
-
-
-/*** vesitable Start ***/
-.vesitable .vesitable-item {
-    height: 100%;
-    transition: 0.5s;
-}
-
-.vesitable .vesitable-item:hover {
-    box-shadow: 0 0 55px rgba(0, 0, 0, 0.4);
-}
-
-.vesitable .vesitable-item .vesitable-img {
-    overflow: hidden;
-    transition: 0.5s;
-    border-radius: 10px 10px 0 0;
-}
-
-.vesitable .vesitable-item .vesitable-img img {
-    transition: 0.5s;
-}
-
-.vesitable .vesitable-item .vesitable-img img:hover {
-    transform: scale(1.2);
-}
-
-.vesitable .owl-stage {
-    margin: 50px 0;
-    position: relative;
-}
-
-.vesitable .owl-nav .owl-prev {
-    position: absolute;
-    top: -8px;
-    right: 0;
-    color: var(--bs-primary);
-    padding: 5px 25px;
-    border: 1px solid var(--bs-secondary);
-    border-radius: 20px;
-    transition: 0.5s;
-
-}
-
-.vesitable .owl-nav .owl-prev:hover {
-    background: var(--bs-secondary);
-    color: var(--bs-white);
-}
-
-.vesitable .owl-nav .owl-next {
-    position: absolute;
-    top: -8px;
-    right: 88px;
-    color: var(--bs-primary);
-    padding: 5px 25px;
-    border: 1px solid var(--bs-secondary);
-    border-radius: 20px;
-    transition: 0.5s;
-}
-
-.vesitable .owl-nav .owl-next:hover {
-    background: var(--bs-secondary);
-    color: var(--bs-white);
-}
-/*** vesitable End ***/
 
 
 /*** Banner Section Start ***/
@@ -474,41 +579,6 @@
 /*** Facts End ***/
 
 
-/*** testimonial Start ***/
-.testimonial .owl-nav .owl-prev {
-    position: absolute;
-    top: -58px;
-    right: 0;
-    color: var(--bs-primary);
-    padding: 5px 25px;
-    border: 1px solid var(--bs-secondary);
-    border-radius: 20px;
-    transition: 0.5s;
-}
-
-.testimonial .owl-nav .owl-prev:hover {
-    background: var(--bs-secondary);
-    color: var(--bs-white);
-}
-
-.testimonial .owl-nav .owl-next {
-    position: absolute;
-    top: -58px;
-    right: 88px;
-    color: var(--bs-primary);
-    padding: 5px 25px;
-    border: 1px solid var(--bs-secondary);
-    border-radius: 20px;
-    transition: 0.5s;
-}
-
-.testimonial .owl-nav .owl-next:hover {
-    background: var(--bs-secondary);
-    color: var(--bs-white);
-}
-/*** testimonial End ***/
-
-
 /*** Single Page Start ***/
 .pagination {
     display: inline-block;
@@ -537,22 +607,71 @@
 /*** Single Page End ***/
 
 
-/*** Footer Start ***/
-.footer .footer-item .btn-link {
-    line-height: 35px;
-    color: rgba(255, 255, 255, .5);
-    transition: 0.5s;
+/* General Footer Background */
+.footer {
+  background-color: #003049 !important;
 }
 
-.footer .footer-item .btn-link:hover {
-    color: var(--bs-secondary) !important;
+/* Texto blanco claro */
+.footer,
+.footer h5,
+.footer a,
+.footer p,
+.footer small {
+  color: #FDF0D5 !important;
 }
 
-.footer .footer-item p.mb-4 {
-    line-height: 35px;
+/* Enlaces en hover */
+.footer a:hover {
+  color: #C1121F !important;
+  text-decoration: underline;
 }
-/*** Footer End ***/
 
-:root {
-  --bs-success: #aa0909;
+/* Específico para el subtítulo "Repuestos automotrices..." */
+.footer h2 + p {
+  color: #FDF0D5 !important;
 }
+
+/* Redes sociales */
+.footer .btn-outline-light {
+  border-color: #FDF0D5;
+  color: #FDF0D5;
+}
+
+.footer .btn-outline-light:hover {
+  background-color: #C1121F;
+  color: white;
+  border-color: #C1121F;
+}
+
+/* Línea inferior del footer */
+.bg-black {
+  background-color: #002135 !important;
+  color: #FDF0D5;
+}
+
+/* Paleta aplicada globalmente */
+.text-rojo {
+  color: #C1121F !important;
+}
+
+.text-azul {
+  color: #003049 !important;
+}
+
+.text-blanco-suave {
+  color: #FDF0D5 !important;
+}
+
+.bg-rojo {
+  background-color: #780000 !important;
+}
+
+.bg-azul {
+  background-color: #003049 !important;
+}
+
+.bg-celeste {
+  background-color: #669BBC !important;
+}
+

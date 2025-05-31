@@ -58,23 +58,24 @@
     <div class="container py-5">
         <div class="row g-5 align-items-center">
             <div class="col-md-12 col-lg-7">
-                <h4 class="mb-3 text-secondary">Compra confiable y rápida</h4>
-                <h1 class="mb-5 display-3 text-primary">Repuestos y Accesorios Automotrices</h1>
-                <div class="position-relative mx-auto">
-                    <input class="form-control border-2 border-secondary w-75 py-3 px-4 rounded-pill" type="search" placeholder="Busca tu repuesto aquí...">
-                    <button type="submit" class="btn btn-primary border-2 border-secondary py-3 px-4 position-absolute rounded-pill text-white h-100" style="top: 0; right: 25%;">Buscar</button>
+                <h4 class="mb-3" style="color: #669BBC;">Compra confiable y rápida</h4>
+                <h1 class="mb-4 display-3" style="color: #FDF0D5;">Repuestos y Accesorios Automotrices</h1>
+                <div class="mt-4">
+                    <p class="lead text-blanco-suave">Explora nuestros productos destacados y encuentra el repuesto perfecto para tu vehículo.</p>
+                    <a href="{% url 'catalogo' %}" class="btn btn-lg rounded-pill px-5 py-3" style="background-color: #C1121F; color: #FDF0D5; font-weight: bold; box-shadow: 0 0 10px rgba(0,0,0,0.3); transition: 0.3s;">
+                    Ir al Catálogo
+                    <i class="fas fa-arrow-right ms-2"></i>
+                    </a>
                 </div>
-            </div>
+                </div>            
             <div class="col-md-12 col-lg-5">
                 <div id="carouselId" class="carousel slide position-relative" data-bs-ride="carousel">
                     <div class="carousel-inner" role="listbox">
                         <div class="carousel-item rounded active">
                             <img src="{% static 'img/hero-img-1.png' %}" class="img-fluid w-100 h-100 bg-secondary rounded" alt="Oferta 1">
-                            <a href="#" class="btn px-4 py-2 text-white rounded">Oferta especial</a>
                         </div>
                         <div class="carousel-item rounded">
                             <img src="{% static 'img/hero-img-2.jpg' %}" class="img-fluid w-100 h-100 bg-secondary rounded" alt="Oferta 2">
-                            <a href="#" class="btn px-4 py-2 text-white rounded">Descuento mayorista</a>
                         </div>
                     </div>
                     <button class="carousel-control-prev" type="button" data-bs-target="#carouselId" data-bs-slide="prev">
@@ -92,25 +93,25 @@
 </div>
 <!-- Hero End -->
 
-
 <!-- Beneficios Principales -->
 <div class="container-fluid featurs py-5">
     <div class="container py-5">
         <div class="row g-4">
             <div class="col-md-6 col-lg-3">
-                <div class="featurs-item text-center rounded bg-light p-4">
-                    <div class="featurs-icon btn-square rounded-circle bg-secondary mb-5 mx-auto">
-                        <i class="fas fa-car-side fa-3x text-white"></i>
-                    </div>
-                    <div class="featurs-content text-center">
-                        <h5>Envío Gratis</h5>
-                        <p class="mb-0">En compras sobre $300.000 CLP</p>
-                    </div>
+                <div class="featurs-item text-center rounded bg-personalizado p-4">
+                <div class="featurs-icon mb-5 mx-auto">
+                    <i class="fas fa-car-side fa-3x text-white"></i> 
                 </div>
-            </div>
+                <div class="featurs-content text-center">
+                    <h5 class="text-azul">Envío Gratis</h5>
+                    <p class="mb-0 text-celeste">En compras sobre $300.000 CLP</p>
+                </div>
+            </div>            
+        </div>
             <div class="col-md-6 col-lg-3">
-                <div class="featurs-item text-center rounded bg-light p-4">
-                    <div class="featurs-icon btn-square rounded-circle bg-secondary mb-5 mx-auto">
+                <div class="featurs-item text-center rounded bg-personalizado p-4">
+                    <div class="featurs-icon mb-5 mx-auto">
+
                         <i class="fas fa-user-shield fa-3x text-white"></i>
                     </div>
                     <div class="featurs-content text-center">
@@ -120,8 +121,8 @@
                 </div>
             </div>
             <div class="col-md-6 col-lg-3">
-                <div class="featurs-item text-center rounded bg-light p-4">
-                    <div class="featurs-icon btn-square rounded-circle bg-secondary mb-5 mx-auto">
+                <div class="featurs-item text-center rounded bg-personalizado p-4">
+                    <div class="featurs-icon mb-5 mx-auto">
                         <i class="fas fa-exchange-alt fa-3x text-white"></i>
                     </div>
                     <div class="featurs-content text-center">
@@ -131,8 +132,8 @@
                 </div>
             </div>
             <div class="col-md-6 col-lg-3">
-                <div class="featurs-item text-center rounded bg-light p-4">
-                    <div class="featurs-icon btn-square rounded-circle bg-secondary mb-5 mx-auto">
+                <div class="featurs-item text-center rounded bg-personalizado p-4">
+                    <div class="featurs-icon mb-5 mx-auto">
                         <i class="fa fa-phone-alt fa-3x text-white"></i>
                     </div>
                     <div class="featurs-content text-center">
@@ -152,28 +153,26 @@
 <div class="container-fluid service py-5">
     <div class="container py-5">
         <div class="row g-4 justify-content-center">
-
             <div class="col-md-6 col-lg-4">
-                <a href="#">
-                    <div class="service-item bg-secondary rounded border border-secondary">
-<img src="/media/productos/DGPFRENOS.webp" alt="Pastillas de freno">
-                        <div class="px-4 rounded-bottom">
-                            <div class="service-content bg-primary text-center p-4 rounded">
-                                <h5 class="text-white">Pastillas de freno</h5>
-                                <h3 class="mb-0">15% OFF</h3>
-                            </div>
-                        </div>
+            <a href="#">
+                <div class="service-item bg-oferta rounded border border-rojo">
+                <img src="{% static 'img/best-product-3.jpg' %}" class="img-fluid rounded-top w-100" alt="Pastillas de freno">
+                <div class="px-4 rounded-bottom">
+                    <div class="service-content bg-destacado text-center p-4 rounded">
+                    <h5 class="text-white">Pastillas de freno</h5>
+                    <h3 class="mb-0">15% de descuento</h3>
                     </div>
-                </a>
+                </div>
+                </div>
+            </a>
             </div>
-
             <div class="col-md-6 col-lg-4">
                 <a href="#">
-                    <div class="service-item bg-dark rounded border border-dark">
+                    <div class="service-item bg-oferta rounded border border-rojo">
                         <img src="{% static 'img/best-product-1.jpg' %}" class="img-fluid rounded-top w-100" alt="Oil Filter">
                         <div class="px-4 rounded-bottom">
-                            <div class="service-content bg-light text-center p-4 rounded">
-                                <h5 class="text-primary">Filtros de aceite</h5>
+                            <div class="service-content bg-destacado text-center p-4 rounded">
+                                <h5 class="text-white">Filtros de aceite</h5>
                                 <h3 class="mb-0">Envío gratis</h3>
                             </div>
                         </div>
@@ -183,36 +182,33 @@
 
             <div class="col-md-6 col-lg-4">
                 <a href="#">
-                    <div class="service-item bg-primary rounded border border-primary">
-                        <img src="{% static 'img/spark-plugs.jpg' %}" class="img-fluid rounded-top w-100" alt="Spark Plugs">
+                    <div class="service-item bg-oferta rounded border border-rojo">
+                        <img src="{% static 'img/best-product-2.jpg' %}" class="img-fluid rounded-top w-100" alt="Spark Plugs">
                         <div class="px-4 rounded-bottom">
-                            <div class="service-content bg-secondary text-center p-4 rounded">
+                            <div class="service-content bg-destacado text-center p-4 rounded">
                                 <h5 class="text-white">Bujías</h5>
-                                <h3 class="mb-0">Descuento $20</h3>
+                                <h3 class="mb-0">5% de descuento</h3>
                             </div>
                         </div>
                     </div>
                 </a>
             </div>
-
         </div>
     </div>
 </div>
 <!-- Ofertas Especiales End -->
 
-
-
 <!-- Bestseller Products Start -->
-<div class="container-fluid py-5">
-    <div class="container py-5">
-        <div class="text-center mx-auto mb-5" style="max-width: 700px;">
-            <h1 class="display-4">Productos Más Vendidos</h1>
-            <p>Descubre los repuestos más populares entre nuestros clientes. Calidad y garantía para tu vehículo.</p>
-        </div>
-        <div class="row g-4" id="bestseller">
-
-        </div>
+<div class="container-fluid py-5 bg-bestseller-section">
+  <div class="container py-5">
+    <div class="text-center mx-auto mb-5" style="max-width: 700px;">
+      <h1 class="display-5 fw-bold text-azul position-relative d-inline-block section-title">
+        Productos Más Vendidos
+      </h1>
+      <p class="text-celeste mt-3">Descubre los repuestos más populares entre nuestros clientes.<br>Calidad y garantía para tu vehículo.</p>
     </div>
+    <div class="row g-4" id="bestseller"></div>
+  </div>
 </div>
 <!-- Bestseller Products End -->
 
@@ -222,11 +218,10 @@
 
 
         <!-- Back to Top -->
-        <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top"><i class="fa fa-arrow-up"></i></a>   
-
-            
-        
-
+ 
+<a href="#" class="btn-volver-arriba back-to-top">
+  <i class="fa fa-arrow-up"></i>
+</a>
         <div id="lightboxOverlay" tabindex="-1" class="lightboxOverlay" style="display: none;"></div><div id="lightbox" tabindex="-1" class="lightbox" style="display: none;"><div class="lb-outerContainer"><div class="lb-container"><img class="lb-image" src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" alt=""><div class="lb-nav"><a class="lb-prev" role="button" tabindex="0" aria-label="Previous image" href=""></a><a class="lb-next" role="button" tabindex="0" aria-label="Next image" href=""></a></div><div class="lb-loader"><a class="lb-cancel" role="button" tabindex="0"></a></div></div></div><div class="lb-dataContainer"><div class="lb-data"><div class="lb-details"><span class="lb-caption"></span><span class="lb-number"></span></div><div class="lb-closeContainer"><a class="lb-close" role="button" tabindex="0"></a></div></div></div></div>
 
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
