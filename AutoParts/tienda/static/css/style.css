@@ -1,3 +1,4 @@
+
 :root {
   --bs-primary: #aa0909;
   --bs-secondary: #444344;
@@ -14,10 +15,36 @@
   color: #6e4fc2 !important
 }
 
+/* HEADER LOGO Y ESAS COSAS */
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  height: 140px; /* altura escritorio */
+  padding: 0;
+}
 
+.logo-img {
+  max-height: 140px;
+  width: auto;
+  height: auto;
+}
+
+@media (max-width: 768px) {
+  .navbar-brand {
+    height: 100px; /* altura móvil */
+  }
+  .logo-img {
+    max-height: 100px;
+  }
+
+  .navbar {
+    padding-top: 0.3rem;
+    padding-bottom: 0.3rem;
+  }
+}
 
 .custom-header{
-    background-color: #d3d3d3 !important;
+    background-color: #ffdede !important;
 
 }
 /*** Spinner Start ***/
