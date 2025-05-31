@@ -138,6 +138,7 @@ class CarritoView(APIView):
         data = [
             {
                 "producto": item.producto.nombre,
+                "producto_id": item.producto.id,
                 "cantidad": item.cantidad,
                 "precio": item.producto.precio,
             }

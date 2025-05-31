@@ -32,41 +32,19 @@
 <body>
     <div class="container mt-5">
     <h2>Tu Carrito</h2>
-    
-    {% if carrito_items %}
-        <table class="table table-bordered mt-3">
-        <thead class="table-secondary">
-            <tr>
-            <th>Producto</th>
-            <th>Precio</th>
-            <th>Cantidad</th>
-            <th>Subtotal</th>
-            <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for item in carrito_items %}
-            <tr>
-            <td>{{ item.producto.nombre }}</td>
-            <td>${{ item.producto.precio }}</td>
-            <td>{{ item.cantidad }}</td>
-            <td>${{ item.subtotal|floatformat:2 }}</td>
-            <td>
-                <form method="post" action="{% url 'remover-carrito' item.producto.id %}">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
-                </form>
-            </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-        </table>
-        <a href="{% url 'catalogo' %}" class="btn btn-primary">Seguir comprando</a>
-    {% else %}
-        <p>No tienes productos en tu carrito.</p>
-        <a href="{% url 'catalogo' %}" class="btn btn-primary">Ir al catálogo</a>
-    {% endif %}
-    </div>  
+    <table class="table table-bordered mt-3">
+      <thead class="table-secondary">
+        <tr>
+          <th>Producto</th>
+          <th>Precio</th>
+          <th>Cantidad</th>
+          <th>Subtotal</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
 
 
 
@@ -106,21 +84,21 @@
       }
 
       carritoItems.forEach(item => {
-        const fila = document.createElement("tr");
-        fila.innerHTML = `
-          <td>${item.producto}</td>
-          <td>$${item.precio}</td>
-          <td>${item.cantidad}</td>
-          <td>$${(item.precio * item.cantidad).toFixed(2)}</td>
-          <td>
-            <form method="post" action="/carrito/remover/${item.id}/">
-              <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-              <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
-            </form>
-          </td>
-        `;
-        tbody.appendChild(fila);
-      });
+      const fila = document.createElement("tr");
+      fila.innerHTML = `
+        <td>${item.producto}</td>
+        <td>$${item.precio}</td>
+        <td>${item.cantidad}</td>
+        <td>$${(item.precio * item.cantidad).toFixed(2)}</td>
+        <td>
+          <form method="post" action="/carrito/remover/${item.producto_id}/">
+            <input type="hidden" name="csrfmiddlewaretoken" value="${getCSRFToken()}">
+            <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+          </form>
+        </td>
+      `;
+      tbody.appendChild(fila);
+    });
 
     } catch (error) {
       localStorage.removeItem("token");
