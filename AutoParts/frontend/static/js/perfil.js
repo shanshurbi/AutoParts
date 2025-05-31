@@ -25,5 +25,5 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   document.getElementById('logout-btn').addEventListener('click', () => {
     localStorage.removeItem('token');
-    window.location.href = "{% url 'home' %}";
+    window.location.href = "/";
   });
