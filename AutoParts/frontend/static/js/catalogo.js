@@ -24,6 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 container.innerHTML = '';
 
                 productos.forEach(p => {
+                    console.log("Imagen:", p.imagen)
                     const card = `
                     <div class="col-md-6 col-lg-6 col-xl-4">
                         <a href="/producto/${p.id}" class="text-decoration-none">

@@ -1,17 +1,20 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework import status
+from rest_framework import status, permissions
 from rest_framework.authtoken.models import Token
-from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework.authentication import TokenAuthentication, SessionAuthentication
+from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
+from rest_framework.authentication import TokenAuthentication
 
 from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.http import JsonResponse
 from django.conf import settings
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 
-from .models import Producto, Vehiculo, Categoria, Carrito, CarritoItem
+from .models import Producto, Vehiculo, Categoria, Carrito, CarritoItem, PerfilUsuario
 from .serializers import ProductoSerializer, VehiculoSerializer
 
 import re, os
@@ -89,6 +92,7 @@ def catalogo_view(request):
         'categorias': categorias,
     })
 
+@method_decorator(csrf_exempt, name='dispatch')
 class RegistroView(APIView):
     permission_classes = [AllowAny]
     def post(self, request):
@@ -231,3 +235,61 @@ class CarritoContadorView(APIView):
         
         count = sum(item.cantidad for item in CarritoItem.objects.filter(carrito=carrito))
         return JsonResponse({'count':count})
+
+class TrabajadoresAdminView(APIView):
+    permission_classes = [IsAdminUser]  # Solo admins
+
+    def get(self, request):
+        # Listar usuarios con su perfil trabajador
+        perfiles = PerfilUsuario.objects.select_related('user').all()
+        data = []
+        for perfil in perfiles:
+            data.append({
+                'id': perfil.user.id,
+                'username': perfil.user.username,
+                'email': perfil.user.email,
+                'trabajador': perfil.trabajador,
+            })
+        return Response(data)
+
+    def post(self, request):
+        # Modificar campo trabajador de un usuario
+        user_id = request.data.get('user_id')
+        trabajador = request.data.get('trabajador')
+        if user_id is None or trabajador is None:
+            return Response({'error': 'Faltan datos'}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            perfil = PerfilUsuario.objects.get(user_id=user_id)
+            perfil.trabajador = trabajador
+            perfil.save()
+            return Response({'success': True})
+        except PerfilUsuario.DoesNotExist:
+            return Response({'error': 'Usuario no encontrado'}, status=status.HTTP_404_NOT_FOUND)
+
+def admin_required(user):
+    return user.is_authenticated and user.is_staff 
+
+@login_required
+@user_passes_test(admin_required)
+def gestion_page(request):
+    return render(request, 'gestion_trabajadores.html')
+
+class TrabajadorUpdateView(APIView):
+    permission_classes = [IsAdminUser]
+
+    def patch(self, request, user_id):
+        try:
+            user = User.objects.get(id=user_id)
+            perfil = user.perfilusuario  # O como se llame la relación OneToOne
+        except User.DoesNotExist:
+            return Response({'error': 'Usuario no encontrado'}, status=status.HTTP_404_NOT_FOUND)
+        except PerfilUsuario.DoesNotExist:
+            return Response({'error': 'Perfil no encontrado'}, status=status.HTTP_404_NOT_FOUND)
+
+        trabajador = request.data.get('trabajador')
+        if trabajador is None:
+            return Response({'error': 'Campo trabajador es requerido'}, status=status.HTTP_400_BAD_REQUEST)
+
+        perfil.trabajador = trabajador
+        perfil.save()
+        return Response({'success': 'Estado actualizado'}, status=status.HTTP_200_OK)

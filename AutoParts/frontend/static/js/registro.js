@@ -1,3 +1,18 @@
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let cookie of cookies) {
+      cookie = cookie.trim();
+      if (cookie.startsWith(name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+
 document.getElementById("register-form").addEventListener("submit", async function(e) {
   e.preventDefault();
 
@@ -25,17 +40,19 @@ document.getElementById("register-form").addEventListener("submit", async functi
     return;
   }
 
+  const csrftoken = getCookie('csrftoken');
+
   const response = await fetch("/api/registro/", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "X-CSRFToken": "{{ csrf_token }}"
+      "X-CSRFToken": csrftoken
     },
     body: JSON.stringify({
       usuario: username,
       email: email,
       contraseña: password,
-      contraseña_confirm: passwordConfirm  // IMPORTANTE: envía también el confirm
+      contraseña_confirm: passwordConfirm
     })
   });
 
@@ -43,7 +60,7 @@ document.getElementById("register-form").addEventListener("submit", async functi
 
   if (response.ok) {
     localStorage.setItem("token", data.token);
-    window.location.href = "{% url 'home' %}";
+    window.location.href = "/"; // O la URL de tu página de inicio
   } else {
     mensajeError.textContent = data.error || "Error desconocido";
     mensajeError.style.display = "block";

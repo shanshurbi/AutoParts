@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from .views import ProductoAPIView, HomeView, LoginView, login_page, catalogo_view, RegistroView, registro_page, PerfilUsuarioView, perfil_page, detalle_producto, CarritoView, AgregarCarritoView, RemoverDelCarritoView, carrito_page, CarritoContadorView
+from .views import ProductoAPIView, HomeView, LoginView, login_page, catalogo_view, RegistroView, registro_page, PerfilUsuarioView, perfil_page, detalle_producto, CarritoView, AgregarCarritoView, RemoverDelCarritoView, carrito_page, CarritoContadorView, TrabajadoresAdminView, gestion_page, TrabajadorUpdateView
 
 urlpatterns=[
     path('', HomeView.as_view(), name='home'),
@@ -18,5 +18,7 @@ urlpatterns=[
     path('carrito/remover/<int:producto_id>/', RemoverDelCarritoView.as_view(), name='remover-carrito'),
     path('carrito/', carrito_page, name='carrito'),
     path('carrito/contador/', CarritoContadorView.as_view(), name='contador-carrito'),
-
+    path('api/admin/trabajadores/', TrabajadoresAdminView.as_view(), name='admin-trabajadores'),
+    path('gestion_trabajadores', gestion_page, name='gestion_trabajadores'),
+    path('api/admin/trabajadores/<int:user_id>/', TrabajadorUpdateView.as_view(), name='trabajador-update'),
 ]
