@@ -30,21 +30,31 @@
         {% include "base/header.html" %}
 </head>
 <body>
-    <div class="container mt-5">
-    <h2>Tu Carrito</h2>
-    <table class="table table-bordered mt-3">
-      <thead class="table-secondary">
-        <tr>
-          <th>Producto</th>
-          <th>Precio</th>
-          <th>Cantidad</th>
-          <th>Subtotal</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
+    <main style="padding-top: 180px;">
+      <div class="container">
+        <div class="col-md-10 col-lg-8 mx-auto">
+          <div class="rounded position-relative shadow-sm p-4" style="background: #f8f9fa;">
+            <h3 class="mb-4 text-center">Tu Carrito</h3>
+
+            <table class="table table-striped table-bordered">
+              <thead class="table-dark">
+                <tr>
+                  <th>Producto</th>
+                  <th>Precio</th>
+                  <th>Cantidad</th>
+                  <th>Subtotal</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="carrito-body">
+                <!-- Productos cargados aquí por JavaScript -->
+              </tbody>
+            </table>
+
+          </div>
+        </div>
+      </div>
+    </main>
 
     {% include "base/footer.html" %}
     <script src="{% static 'js/carrito.js' %}"></script>

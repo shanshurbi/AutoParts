@@ -1,4 +1,3 @@
-// Función para obtener el CSRF token desde las cookies
   function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== "") {
@@ -14,7 +13,6 @@
     return cookieValue;
   }
 
-  // Función para eliminar producto del carrito
   function eliminarDelCarrito(productoId) {
     const token = localStorage.getItem("token");
     const csrftoken = getCookie("csrftoken");
@@ -30,7 +28,7 @@
       if (!response.ok) {
         throw new Error("No se pudo eliminar el producto");
       }
-      // Recarga la página para actualizar el carrito
+
       location.reload();
     })
     .catch(error => {
@@ -67,7 +65,6 @@
       if (carritoItems.length === 0) {
         document.querySelector(".container").innerHTML = `
           <p>No tienes productos en tu carrito.</p>
-          <a href="{% url 'catalogo' %}" class="btn btn-primary">Ir al catálogo</a>
         `;
         return;
       }

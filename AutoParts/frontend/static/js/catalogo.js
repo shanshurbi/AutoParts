@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 container.innerHTML = '';
 
                 productos.forEach(p => {
-                    console.log("Imagen:", p.imagen)
+                    console.log("Productp:", p);
                     const card = `
                     <div class="col-md-6 col-lg-6 col-xl-4">
                         <a href="/producto/${p.id}" class="text-decoration-none">
@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             <div class="fruite-img">
                             <img src="${p.imagen}" class="img-fluid w-100 rounded-top" alt="${p.nombre}">
                             </div>
-                            <div class="text-white bg-secondary px-3 py-1 rounded position-absolute" style="top: 10px; left: 10px;">${p.categoria}</div>
+                            <div class="text-white bg-secondary px-3 py-1 rounded position-absolute" style="top: 10px; left: 10px;">${p.nombre_categoria}</div>
                             <div class="p-4 border border-secondary border-top-0 rounded-bottom">
                             <h4>${p.nombre}</h4>
                             <p>${p.descripcion}</p>

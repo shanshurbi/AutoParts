@@ -11,8 +11,12 @@ class ProductoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Producto
-        fields = '__all__'
-        
+        fields = [
+            'id', 'nombre', 'precio', 'descripcion', 'stock', 'imagen',
+            'marca', 'categoria', 'fecha_creacion',
+            'nombre_categoria', 'nombre_marcas'
+        ]
+
     def get_nombre_categoria(self, obj):
         return obj.categoria.nombre if obj.categoria else None
 

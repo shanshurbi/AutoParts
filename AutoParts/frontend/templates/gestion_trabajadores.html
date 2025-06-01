@@ -76,7 +76,7 @@
     }
     const data = await response.json();
     const tbody = document.getElementById('tabla-trabajadores-body');
-    tbody.innerHTML = ''; // limpiar tabla
+    tbody.innerHTML = '';
 
     data.forEach(user => {
       const tr = document.createElement('tr');
