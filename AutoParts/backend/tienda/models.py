@@ -26,6 +26,7 @@ class Marca(models.Model):
 class Producto(models.Model):
     nombre = models.CharField(max_length=100)
     precio = models.PositiveIntegerField(default=1)
+    precio_mayorista = models.PositiveIntegerField(default=1)
     descripcion = models.CharField(max_length=500)
     stock =  models.PositiveIntegerField()
     imagen = models.ImageField(upload_to='productos/', null=True, blank=True)
