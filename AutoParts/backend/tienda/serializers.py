@@ -2,19 +2,33 @@ from rest_framework import serializers
 from .models import Producto, Marca, Categoria, Vehiculo, Carrito, CarritoItem
 
 class ProductoSerializer(serializers.ModelSerializer):
-    imagen = serializers.ImageField(use_url=True)
-    marca = serializers.StringRelatedField(many=True)
-    categoria = serializers.StringRelatedField()
+    imagen = serializers.ImageField(required=False)
+    marca = serializers.PrimaryKeyRelatedField(queryset=Marca.objects.all(), many=True)
+    categoria = serializers.PrimaryKeyRelatedField(queryset=Categoria.objects.all())
     
-    class Meta: 
-        model = Producto
-        fields = '__all__'
+    nombre_categoria = serializers.SerializerMethodField()
+    nombre_marcas = serializers.SerializerMethodField()
 
-    def get_imagen(self, obj):
-        request = self.context.get('request')
-        if obj.imagen:
-            return request.build_absolute_uri(obj.imagen.url)
-        return None
+    class Meta:
+        model = Producto
+        fields = [
+            'id',
+            'nombre',
+            'precio',
+            'descripcion',
+            'stock',
+            'imagen',
+            'marca',
+            'categoria',
+            'nombre_categoria',
+            'nombre_marcas'
+        ]
+
+    def get_nombre_categoria(self, obj):
+        return obj.categoria.nombre if obj.categoria else None
+
+    def get_nombre_marcas(self, obj):
+        return [marca.nombre for marca in obj.marca.all()]
     
 class MarcaSerializer(serializers.ModelSerializer):
     class  Meta:

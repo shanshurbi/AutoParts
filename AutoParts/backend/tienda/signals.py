@@ -7,3 +7,7 @@ from .models import PerfilUsuario
 def crear_perfil_usuario(sender, instance, created, **kwargs):
     if created:
         PerfilUsuario.objects.create(user=instance)
+
+@receiver(post_save, sender=User)
+def guardar_perfil_usuario(sender, instance, **kwargs):
+    instance.perfilusuario.save()

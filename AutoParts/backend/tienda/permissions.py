@@ -1,9 +1,12 @@
-from rest_framework.permissions import BasePermission
+from .models import PerfilUsuario
+from rest_framework import permissions
 
-class EsTrabajador(BasePermission):
+class EsTrabajador(permissions.BasePermission):
     def has_permission(self, request, view):
-        return (
-            request.user.is_authenticated and
-            hasattr(request.user, 'perfilusuario') and
-            request.user.perfilusuario.trabajador
-        )
+        if not request.user.is_authenticated:
+            return False
+
+        try:
+            return request.user.perfilusuario.trabajador
+        except PerfilUsuario.DoesNotExist:
+            return False

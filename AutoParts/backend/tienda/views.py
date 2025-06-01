@@ -4,6 +4,7 @@ from rest_framework import status, permissions
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from rest_framework.authentication import TokenAuthentication
+from rest_framework.parsers import MultiPartParser, FormParser
 
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth import authenticate
@@ -26,7 +27,8 @@ def lista_productos(request):
     return render(request,'productos.html', {'productos':productos})
 
 class ProductoAPIView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [AllowAny]  # Puedes usar permisos más restrictivos si deseas
+
     def get(self, request):
         productos = Producto.objects.all()
         categoria_id = request.GET.get("categoria")
@@ -46,6 +48,13 @@ class ProductoAPIView(APIView):
 
         serializer = ProductoSerializer(productos, many=True)
         return Response(serializer.data)
+
+    def post(self, request):
+        serializer = ProductoSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class HomeView(APIView):
     permission_classes = [AllowAny]
@@ -293,3 +302,68 @@ class TrabajadorUpdateView(APIView):
         perfil.trabajador = trabajador
         perfil.save()
         return Response({'success': 'Estado actualizado'}, status=status.HTTP_200_OK)
+    
+class EsTrabajador(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return bool(request.user and 
+                    request.user.is_authenticated and 
+                    hasattr(request.user, 'perfilusuario') and 
+                    request.user.perfilusuario.trabajador)
+    
+class ProductoCrudView(APIView):
+    parser_classes = [MultiPartParser, FormParser]
+    permission_classes = [permissions.IsAuthenticated, EsTrabajador]
+
+    def get(self, request):
+        productos = Producto.objects.all()
+        serializer = ProductoSerializer(productos, many=True, context={'request': request})
+        return Response(serializer.data)
+
+    def post(self, request):
+        serializer = ProductoSerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class ProductoDetalleAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated, EsTrabajador]
+
+    def get_object(self, pk):
+        try:
+            return Producto.objects.get(pk=pk)
+        except Producto.DoesNotExist:
+            return None
+
+    def get(self, request, pk):
+        producto = self.get_object(pk)
+        if not producto:
+            return Response({'error': 'Producto no encontrado'}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = ProductoSerializer(producto)
+        return Response(serializer.data)
+
+    def put(self, request, pk):
+        producto = self.get_object(pk)
+        if not producto:
+            return Response({'error': 'Producto no encontrado'}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = ProductoSerializer(producto, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk):
+        producto = self.get_object(pk)
+        if not producto:
+            return Response({'error': 'Producto no encontrado'}, status=status.HTTP_404_NOT_FOUND)
+
+        producto.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
+    
+    
+def gestion_prod_page(request):
+    categorias = Categoria.objects.all()
+    return render(request, 'gestion_productos.html', {'categorias': categorias})
