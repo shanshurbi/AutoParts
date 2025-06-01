@@ -54,6 +54,34 @@
 .icono-principal {
   color: #780000 !important;
 }
+
+.navbar {
+  padding: 1rem 2rem; 
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    padding: 0.5rem 1rem; 
+  }
+
+  .navbar-brand {
+    height: auto; 
+    padding-bottom: 0.3rem; 
+  }
+
+  .logo-img {
+    max-height: 110px;
+    max-width: 100%;
+    height: auto;
+    display: block;
+  }
+}
+
+.logo-img {
+  max-width: 100%;
+  height: auto;
+}
+
 /* FIN HEADER ICONOS Y COSAS */
 
 /* INICIO BEST SELEERS MEJORES VENDIDOS NO SÉ */
