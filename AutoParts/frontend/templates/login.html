@@ -32,42 +32,36 @@
     
 
 <body>
-    <main style="padding-top: 180px;">
-    <div class="container">
-      <div class="col-md-6 col-lg-4 mx-auto"> 
-        <div class="rounded position-relative fruite-item shadow-sm p-4" style="background: #f8f9fa;">
-        <h3 class="mb-4 text-center">Iniciar sesión</h3>
+<main class="login-bg d-flex align-items-center justify-content-center">
+  <div class="login-card p-5 rounded shadow">
+    <h3 class="mb-4 text-center text-azul fw-bold">Iniciar sesión</h3>
     <form method="POST" id="login-form">
       {% csrf_token %}
-      
+
       <input 
-        class="form-control border-2 border-secondary w-100 py-3 px-4 rounded-pill mb-3" 
+        class="form-control custom-input mb-3" 
         type="text" 
         name="username" 
         placeholder="Usuario" 
         required 
       />
-      
+
       <input 
-        class="form-control border-2 border-secondary w-100 py-3 px-4 rounded-pill mb-4" 
+        class="form-control custom-input mb-4" 
         type="password" 
         name="password" 
         placeholder="Contraseña" 
         required 
       />
-      
-      <div class="d-flex justify-content-between">
-        <button type="submit" class="btn btn-success rounded-pill px-4 py-2">
-          Iniciar sesión
-        </button>
-        <a href="{% url 'registro' %}" class="btn btn-primary rounded-pill px-4 py-2">
-          Registrarse
-        </a>
-        </div>
-        </form>
-    
-    </div>
-    </main>
+
+      <button type="submit" class="btn btn-login w-100 mb-3">Iniciar sesión</button>
+
+      <p class="text-center mt-3 mb-0">
+        ¿No tienes cuenta? <a href="{% url 'registro' %}" class="registro-link">Registrarse</a>
+      </p>
+    </form>
+  </div>
+</main>
     
 </div>
      <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

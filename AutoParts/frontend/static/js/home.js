@@ -13,30 +13,25 @@
 
                     productos.slice(0, 3).forEach(p => {
                         const card = `
-                        <div class="col-lg-6 col-xl-4">
-                            <div class="p-4 rounded bg-light">
-                                <div class="row align-items-center">
-                                    <div class="col-6">
-                                        <img src="${p.imagen}" class="img-fluid rounded-circle w-100" alt="Pastillas de Freno">
-                                    </div>
-                                    <div class="col-6">
-                                        <a href="#" class="h5">${p.nombre}</a>
-                                        <div class="d-flex my-3">
-                                            <i class="fas fa-star text-primary"></i>
-                                            <i class="fas fa-star text-primary"></i>
-                                            <i class="fas fa-star text-primary"></i>
-                                            <i class="fas fa-star-half-alt text-primary"></i>
+                            <div class="col-md-6 col-lg-4 loaded">
+                                <div class="card h-100 card-hover bg-bestseller border-0 rounded shadow-sm">
+                                    <img src="${p.imagen}" class="card-img-top img-fluid rounded-top" alt="${p.nombre}" style="max-height: 250px; object-fit: cover; border-bottom: 4px solid #C1121F;">
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title text-azul fw-bold">${p.nombre}</h5>
+                                        <div class="d-flex justify-content-center my-2">
                                             <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star text-muted"></i>
                                         </div>
-                                        <h4 class="mb-3">$${p.precio}</h4>
-                                        <a href="/producto/${p.id}" class="btn border border-secondary rounded-pill px-3 text-primary">
-                                            <i class="fa fa-shopping-bag me-2 text-primary"></i> ver producto
-                                        </a>
+                                        <h4 class="mb-3 text-dark fw-semibold">$${p.precio}</h4>
+                                        <a href="/producto/${p.id}" class="btn-bestseller">Ver producto <i class="fas fa-arrow-right ms-1"></i></a>
                                     </div>
                                 </div>
                             </div>
-                        </div>`;
-                        container.innerHTML += card;
+                        `;
+                        document.getElementById("bestseller").innerHTML += card;
                     });
                     })
                     .catch(err => console.error("Error cargando productos:", err));

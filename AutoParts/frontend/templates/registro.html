@@ -30,42 +30,27 @@
         {% include "base/header.html" %}
 </head>
 <body>
-    <main style="padding-top: 180px;">
-    <div class="container">
-        <div class="col-md-6 col-lg-4 mx-auto">
-        <div class="rounded position-relative fruite-item shadow-sm p-4" style="background: #f8f9fa;">
-            <h3 class="mb-4 text-center">Registrar usuario</h3>
-            <form method="POST" id="register-form">
-            {% csrf_token %}
+<main class="login-bg d-flex align-items-center justify-content-center">
+  <div class="login-card p-5 rounded shadow">
+    <h3 class="mb-4 text-center text-azul fw-bold">Crear cuenta</h3>
+    <form method="POST" id="register-form">
+      {% csrf_token %}
 
-            <input 
-              class="form-control border-2 border-secondary w-100 py-3 px-4 rounded-pill mb-3" type="text" name="username" placeholder="Usuario" required
-            />
-            <input 
-              class="form-control border-2 border-secondary w-100 py-3 px-4 rounded-pill mb-3" type="email" name="email" placeholder="Correo electrónico" required 
-            />
-            <input 
-            class="form-control border-2 border-secondary w-100 py-3 px-4 rounded-pill mb-4" type="password" name="password" placeholder="Contraseña" required 
-            />
-            <input
-            class="form-control border-2 border-secondary w-100 py-3 px-4 rounded-pill mb-4" type="password" name="password_confirm" placeholder="Confirmar contraseña" required 
-            />
+      <input type="text" name="username" class="form-control custom-input mb-3" placeholder="Usuario" required>
+      <input type="email" name="email" class="form-control custom-input mb-3" placeholder="Correo electrónico" required>
+      <input type="password" name="password" class="form-control custom-input mb-3" placeholder="Contraseña" required>
+      <input type="password" name="password_confirm" class="form-control custom-input mb-3" placeholder="Confirmar contraseña" required>
 
-            <div class="d-flex justify-content-between">
-                </button>
-                <a href="{% url 'login' %}" class="btn btn-success rounded-pill px-4 py-2">
-                Volver al login
-                </a>
-                <button type="submit" class="btn btn-primary rounded-pill px-4 py-2">
-                Registrar
-            </div>
-            </form>
-            <div id="mensaje-error" style="color: red; margin-bottom: 1rem; display: none;"></div>
-        </div>
-        </div>
-    </div>
-    </main>
+      <div id="mensaje-error" class="text-danger mb-3" style="display: none;"></div>
 
+      <button type="submit" class="btn btn-login w-100 mb-3">Registrar</button>
+
+      <p class="text-center mt-3 mb-0">
+        ¿Ya tienes cuenta? <a href="{% url 'login' %}" class="registro-link">Volver al login</a>
+      </p>
+    </form>
+  </div>
+</main>
     {% include "base/footer.html" %}
     <script>function getCookie(name) {
   let cookieValue = null;
