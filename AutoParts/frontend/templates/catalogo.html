@@ -77,6 +77,9 @@
 <script src="{% static 'lib/lightbox/js/lightbox.min.js' %}"></script>
 <script src="{% static 'lib/owlcarousel/owl.carousel.min.js' %}"></script>
 <script src="{% static 'js/catalogo.js' %}"></script>
+<script>
+  const ES_EMPRESA = {{ es_empresa|yesno:"true,false" }};
+</script>
 
 {% include "base/footer.html" %}
 </body>

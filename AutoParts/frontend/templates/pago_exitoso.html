@@ -1,0 +1,72 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Pago Exitoso | AutoParts</title>
+  <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+  <link href="{% static 'css/style.css' %}" rel="stylesheet">
+</head>
+<body>
+  {% include 'base/header.html' %}
+  <main style="padding-top: 180px;">
+    <div class="container text-center">
+      <div class="alert alert-success">
+        <h2 class="mb-4">¡Pago realizado con éxito! ✅</h2>
+        <p>Gracias por tu compra. Aquí tienes el resumen del pedido:</p>
+      </div>
+
+      <div class="card shadow-sm p-4 mb-4">
+        <h4 class="mb-3">Resumen del Pedido</h4>
+        <p><strong>Correo:</strong> {{ email }}</p>
+        <p><strong>Monto total:</strong> <span id="montoTotal">${{ monto }}</span></p>
+        <p><strong>ID de Orden:</strong> {{ order_id }}</p>
+        <p><strong>Método de Pago:</strong> {{ metodo|title }}</p>
+      </div>
+
+      {% if productos %}
+      <div class="card shadow-sm p-4 mb-4">
+        <h5 class="mb-3">Productos Comprados</h5>
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Producto</th>
+              <th>Precio</th>
+              <th>Cantidad</th>
+              <th>Subtotal</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in productos %}
+              <tr>
+                <td>{{ item.producto }}</td>
+                <td>${{ item.precio}}</td>
+                <td>{{ item.cantidad }}</td>
+                <td>${{ item.subtotal}}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% endif %}
+
+      <a href="/" class="btn btn-primary">Volver al inicio</a>
+    </div>
+  </main>
+  {% include 'base/footer.html' %}
+</body>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const montoSpan = document.getElementById("montoTotal");
+    if (montoSpan) {
+      const valor = parseInt(montoSpan.textContent.replace(/\D/g, '')) || 0;
+      montoSpan.textContent = valor.toLocaleString("es-CL", {
+        style: "currency",
+        currency: "CLP",
+        minimumFractionDigits: 0
+      });
+    }
+  });
+</script>
+
+</html>

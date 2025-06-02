@@ -6,3 +6,4 @@ django-filter
 Pillow
 djangorestframework-simplejwt
 transbank-sdk
+humanize

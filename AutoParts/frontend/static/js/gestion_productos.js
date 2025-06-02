@@ -1,3 +1,4 @@
+
 function getCookie(name) {
   let cookieValue = null;
   if (document.cookie && document.cookie !== '') {
@@ -14,9 +15,21 @@ function getCookie(name) {
 }
 
 const csrftoken = getCookie('csrftoken');
+const token = localStorage.getItem("token");
+if (!token) {
+  window.location.href = "/login/";
+}
+
+function formatearCLP(valor) {
+  return `$${valor.toLocaleString('es-CL')}`;
+}
 
 function cargarProductos() {
-  fetch(URL_PRODUCTOS_API)
+  fetch(URL_PRODUCTOS_API, {
+    headers: {
+      "Authorization": "Token " + token
+    }
+  })
     .then(res => res.json())
     .then(productos => {
       const tbody = document.getElementById("productos-lista");
@@ -26,7 +39,8 @@ function cargarProductos() {
           <tr>
             <td>${p.nombre}</td>
             <td>${p.descripcion}</td>
-            <td>$${p.precio}</td>
+            <td>${formatearCLP(p.precio)}</td>
+            <td>${formatearCLP(p.precio_mayorista)}</td>
             <td>${p.stock}</td>
             <td><img src="${p.imagen || ''}" alt="${p.nombre}" style="max-height: 50px;"></td>
             <td>
@@ -42,7 +56,11 @@ function cargarProductos() {
 }
 
 function mostrarFormularioModificar(id) {
-  fetch(`/api/productos/${id}/`)
+  fetch(`/api/productos/${id}/`, {
+    headers: {
+      "Authorization": "Token " + token
+    }
+  })
     .then(res => res.json())
     .then(p => {
       const form = document.getElementById('form-producto');
@@ -50,6 +68,7 @@ function mostrarFormularioModificar(id) {
 
       form.nombre.value = p.nombre;
       form.precio.value = p.precio;
+      form.precio_mayorista.value = p.precio_mayorista;
       form.descripcion.value = p.descripcion;
       form.stock.value = p.stock;
       form.categoria.value = p.categoria; 
@@ -76,7 +95,8 @@ document.getElementById('form-producto').addEventListener('submit', function (e)
   fetch(url, {
     method,
     headers: {
-      'X-CSRFToken': csrftoken,  // No pongas Content-Type si usás FormData
+      'X-CSRFToken': csrftoken,
+      'Authorization': 'Token ' + token
     },
     body: formData,
   })
@@ -108,6 +128,7 @@ function eliminarProducto(id) {
     method: 'DELETE',
     headers: {
       'X-CSRFToken': csrftoken,
+      'Authorization': 'Token ' + token
     }
   })
   .then(res => {

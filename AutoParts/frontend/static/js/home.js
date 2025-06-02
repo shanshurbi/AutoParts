@@ -25,7 +25,7 @@
                                             <i class="fas fa-star"></i>
                                             <i class="fas fa-star text-muted"></i>
                                         </div>
-                                        <h4 class="mb-3 text-dark fw-semibold">$${p.precio}</h4>
+                                        <h4 class="mb-3 text-dark fw-semibold">${p.precio.toLocaleString("es-CL", { style: "currency", currency: "CLP" })}</h4>
                                         <a href="/producto/${p.id}" class="btn-bestseller">Ver producto <i class="fas fa-arrow-right ms-1"></i></a>
                                     </div>
                                 </div>

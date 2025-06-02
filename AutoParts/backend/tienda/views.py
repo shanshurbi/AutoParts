@@ -20,7 +20,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from transbank.webpay.webpay_plus.transaction import Transaction,WebpayOptions
 from transbank.common.integration_type import IntegrationType
-from .models import Producto, Vehiculo, Categoria, Carrito, CarritoItem, PerfilUsuario
+from .models import Pedido, Producto, Vehiculo, Categoria, Carrito, CarritoItem, PerfilUsuario
 from .serializers import ProductoSerializer, VehiculoSerializer
 from django.contrib.auth import logout
 import re, os
@@ -89,6 +89,7 @@ def cerrar_sesion(request):
 
 def generar_order_id():
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=20))
+
 class LoginView(APIView):
     permission_classes = [AllowAny]
     def post(self, request):  
@@ -113,21 +114,27 @@ class VehiculoView(APIView):
     
 def catalogo_view(request):
     categoria_id = request.GET.get('categoria')
-
     productos = Producto.objects.all()
     if categoria_id:
         productos = productos.filter(categoria_id=categoria_id)
 
     categorias = Categoria.objects.all()
 
+    es_empresa = False
+    if request.user.is_authenticated and hasattr(request.user, 'perfilusuario'):
+        es_empresa = request.user.perfilusuario.empresa  # o .trabajador si usas otro flag
+
     return render(request, 'catalogo.html', {
         'productos': productos,
         'categorias': categorias,
+        'es_empresa': es_empresa,  # ← esto es importante
     })
+
 
 @method_decorator(csrf_exempt, name='dispatch')
 class RegistroView(APIView):
     permission_classes = [AllowAny]
+
     def post(self, request):
         username = request.data.get('usuario')
         password = request.data.get('contraseña')
@@ -135,19 +142,28 @@ class RegistroView(APIView):
 
         if not username or not password or not email:
             return Response({'error': 'Faltan datos'}, status=status.HTTP_400_BAD_REQUEST)
+
         if User.objects.filter(username=username).exists():
-            return Response({'error': 'Usuario ya existte'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'Usuario ya existe'}, status=status.HTTP_400_BAD_REQUEST)
+
         if User.objects.filter(email=email).exists():
             return Response({'error': 'El correo electrónico ya está en uso'}, status=status.HTTP_400_BAD_REQUEST)
+
         if not re.search(r'[A-Z]', password):
             return Response({'error': 'La contraseña debe contener al menos una letra mayúscula'}, status=status.HTTP_400_BAD_REQUEST)
+
         if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
             return Response({'error': 'La contraseña debe contener al menos un símbolo'}, status=status.HTTP_400_BAD_REQUEST)
-        
+
+        # Crear el usuario
         user = User.objects.create_user(username=username, password=password, email=email)
+
+        # 🔥 Crear el perfil asociado
+        PerfilUsuario.objects.create(user=user)  # ← Este es el paso que faltaba
+
+        # Crear token
         token = Token.objects.create(user=user)
         return Response({'token': token.key}, status=status.HTTP_201_CREATED)
-    
 def registro_page(request):
     return render(request, 'registro.html')
 
@@ -518,7 +534,18 @@ def crear_pedido(request):
     if not email or not monto or not metodo:
         return Response({"error": "Faltan datos para crear el pedido"}, status=400)
 
+    # Generar order_id válido para Transbank
     order_id = generar_order_id()
+
+    # Crear y guardar el pedido en la base de datos
+    pedido = Pedido.objects.create(
+        order_id=order_id,
+        email=email,
+        monto=monto,
+        estado="pendiente"
+    )
+
+    # Guardar información mínima en sesión para usar en el redireccionamiento
     request.session["order_id"] = order_id
     request.session["email"] = email
     request.session["monto"] = monto
@@ -543,7 +570,7 @@ def pagar_view(request, order_id):
 
     try:
         session_id = f"{request.user.id}-{uuid.uuid4()}"
-        return_url = request.build_absolute_uri("/carrito/confirmar/")
+        return_url = request.build_absolute_uri("/pago_exitoso/")
 
         response = transaction.create(
             buy_order=order_id,
@@ -559,19 +586,37 @@ def pagar_view(request, order_id):
     except Exception as e:
         print("❌ Error al crear la transacción:", e)
         return redirect("/carrito/")
-def pago_exitoso(request):
     
+def pago_exitoso(request):
     token_ws = request.GET.get('token_ws')  
     transaction = Transaction(options) 
     result = transaction.commit(token_ws)  
 
     if result['status'] == 'AUTHORIZED':
-  
-        pedido_id = int(result['buy_order'])  
-        pedido = get_object_or_404(CarritoItem, id=pedido_id)  
-        pedido.estado = 'pagado' 
-        pedido.save()
+        # Leer los datos desde la sesión
+        cart = request.session.get("cart", [])
+        email = request.session.get("email", "")
+        monto = request.session.get("monto", "")
+        metodo = request.session.get("metodo_pago", "")
+        order_id = request.session.get("order_id", "")
 
-        return render(request, 'autopart/pago_exitoso.html', {'pedido': pedido})
+        # Convertimos el carrito para usarlo en la plantilla
+        productos = []
+        for item in cart:
+            productos.append({
+                "producto": item.get("producto", "Producto desconocido"),
+                "precio": item.get("precio", 0),
+                "cantidad": item.get("cantidad", 1),
+                "subtotal": item.get("precio", 0) * item.get("cantidad", 1)
+            })
+
+        return render(request, "pago_exitoso.html", {
+            "email": email,
+            "monto": monto,
+            "order_id": order_id,
+            "metodo": metodo,
+            "productos": productos
+        })
+
     else:
-        return render(request, 'autopart/pago_fallido.html') 
+        return render(request, "autopart/pago_fallido.html")

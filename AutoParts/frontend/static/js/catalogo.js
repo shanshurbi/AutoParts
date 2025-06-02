@@ -37,7 +37,11 @@ document.addEventListener("DOMContentLoaded", () => {
                             <h4>${p.nombre}</h4>
                             <p>${p.descripcion}</p>
                             <div class="d-flex justify-content-between flex-lg-wrap">
-                                <p class="text-dark fs-5 fw-bold mb-0">${p.precio.toLocaleString("es-CL", { style: "currency", currency: "CLP" })}</p>
+                                <p class="text-dark fs-5 fw-bold mb-0">
+                                ${ES_EMPRESA 
+                                    ? p.precio_mayorista.toLocaleString("es-CL", { style: "currency", currency: "CLP" }) 
+                                    : p.precio.toLocaleString("es-CL", { style: "currency", currency: "CLP" })}
+                                </p>
                             </div>
                             </div>
                         </div>

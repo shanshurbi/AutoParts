@@ -75,3 +75,14 @@ class PerfilUsuario(models.Model):
 
     def __str__(self):
         return self.user.username
+    
+
+class Pedido(models.Model):
+    order_id = models.CharField(max_length=26, unique=True)  # ID alfanumérico para Transbank
+    email = models.EmailField()
+    monto = models.PositiveIntegerField()
+    estado = models.CharField(max_length=20, default="pendiente")  # puede ser: pendiente, pagado, fallido, etc.
+    fecha = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Pedido {self.order_id} - {self.email} - {self.estado}"

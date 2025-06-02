@@ -42,27 +42,58 @@ document.getElementById("register-form").addEventListener("submit", async functi
 
   const csrftoken = getCookie('csrftoken');
 
-  const response = await fetch("/api/registro/", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "X-CSRFToken": csrftoken
-    },
-    body: JSON.stringify({
-      usuario: username,
-      email: email,
-      contraseña: password,
-      contraseña_confirm: passwordConfirm
-    })
-  });
+  try {
+    const response = await fetch("/api/registro/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrftoken
+      },
+      body: JSON.stringify({
+        usuario: username,
+        email: email,
+        contraseña: password,
+        contraseña_confirm: passwordConfirm
+      })
+    });
 
-  const data = await response.json();
+    const data = await response.json();
 
-  if (response.ok) {
-    localStorage.setItem("token", data.token);
-    window.location.href = "/"; // O la URL de tu página de inicio
-  } else {
-    mensajeError.textContent = data.error || "Error desconocido";
+    if (response.ok) {
+      const token = data.token;
+      localStorage.setItem("token", token);
+
+      // 🔄 Crear trabajador a través del endpoint admin
+      const perfilResponse = await fetch("/api/perfil/", {
+        headers: { "Authorization": `Token ${token}` }
+      });
+      const perfil = await perfilResponse.json();
+
+      const userId = perfil.id ?? perfil.user_id ?? null;
+
+      if (userId) {
+        await fetch(`/api/admin/trabajadores/${userId}/`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Token ${token}`,
+            "X-CSRFToken": csrftoken
+          },
+          body: JSON.stringify({
+            trabajador: true
+          })
+        });
+      }
+
+      window.location.href = "/";
+    } else {
+      mensajeError.textContent = data.error || "Error desconocido";
+      mensajeError.style.display = "block";
+    }
+
+  } catch (error) {
+    console.error("Error en el registro:", error);
+    mensajeError.textContent = "Error en el servidor";
     mensajeError.style.display = "block";
   }
 });
