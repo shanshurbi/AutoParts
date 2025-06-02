@@ -35,31 +35,12 @@
 <main class="login-bg d-flex align-items-center justify-content-center">
   <div class="login-card p-5 rounded shadow">
     <h3 class="mb-4 text-center text-azul fw-bold">Iniciar sesión</h3>
-    <form method="POST" id="login-form">
-      {% csrf_token %}
-
-      <input 
-        class="form-control custom-input mb-3" 
-        type="text" 
-        name="username" 
-        placeholder="Usuario" 
-        required 
-      />
-
-      <input 
-        class="form-control custom-input mb-4" 
-        type="password" 
-        name="password" 
-        placeholder="Contraseña" 
-        required 
-      />
-
-      <button type="submit" class="btn btn-login w-100 mb-3">Iniciar sesión</button>
-
-      <p class="text-center mt-3 mb-0">
-        ¿No tienes cuenta? <a href="{% url 'registro' %}" class="registro-link">Registrarse</a>
-      </p>
-    </form>
+<form method="POST" action="{% url 'login-con-sesion' %}">
+  {% csrf_token %}
+  <input type="text" name="username" placeholder="Usuario" required />
+  <input type="password" name="password" placeholder="Contraseña" required />
+  <button type="submit">Iniciar sesión</button>
+</form>
   </div>
 </main>
     
@@ -78,37 +59,6 @@
         <script src="{% static 'lib/lightbox/js/lightbox.min.js' %}"></script>
         <script src="{% static 'lib/owlcarousel/owl.carousel.min.js' %}"></script>
         
-        <script>
-          const API_BASE = window.location.origin; // http://localhost:8000
-
-          document.getElementById("login-form").addEventListener("submit", async function(e) {
-            e.preventDefault();
-
-            const email = document.querySelector('input[name="username"]').value;
-            const password = document.querySelector('input[name="password"]').value;
-
-            const response = await fetch(`${API_BASE}/api/login/`, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                "X-CSRFToken": "{{ csrf_token }}"
-              },
-              body: JSON.stringify({
-                usuario: email,
-                contraseña: password
-              })
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-              localStorage.setItem("token", data.token);
-              window.location.href = "/";
-            } else {
-              alert(data.error || 'Error desconocido');
-            }
-          });
-        </script>
 
     {% include "base/footer.html" %}
 

@@ -6,6 +6,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.parsers import MultiPartParser, FormParser
 
+from django.contrib.auth import login
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
@@ -384,3 +385,27 @@ class ProductoDetalleAPIView(APIView):
 def gestion_prod_page(request):
     categorias = Categoria.objects.all()
     return render(request, 'gestion_productos.html', {'categorias': categorias})
+
+class TokenDesdeSesionView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        token, created = Token.objects.get_or_create(user=request.user)
+        return Response({'token': token.key})
+    
+from django.contrib.auth import login  # Asegúrate de tener esto importado
+
+@csrf_exempt
+def login_con_sesion(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)  # ← esto crea la sesión
+            return redirect('/')  # redirige donde quieras
+        else:
+            return render(request, 'login.html', {'error': 'Credenciales inválidas'})
+
+    return render(request, 'login.html')
