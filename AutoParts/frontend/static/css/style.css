@@ -841,3 +841,114 @@ form button:hover {
   box-shadow: 0 0 0 0.25rem rgba(120, 0, 0, 0.25) !important;
 }
 /* Fin detalle producto */
+
+/* CATALOGO */
+
+body {
+    background-color: #FDF0D5;
+    font-family: 'Open Sans', sans-serif;
+}
+
+h1, h4, label {
+    color: #003049;
+}
+
+.fruite-categorie a {
+    color: #780000;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.fruite-categorie a:hover {
+    color: #C1121F;
+}
+
+.form-select {
+    border-color: #003049;
+}
+
+.fruite-item {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    background: white;
+    border: 2px solid #669BBC;
+    border-radius: 10px;
+}
+
+.fruite-item:hover {
+    transform: scale(1.02);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.fruite-img img {
+    border-bottom: 2px solid #669BBC;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.fruite-item h4 {
+    color: #003049;
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+.fruite-item p {
+    color: #555;
+}
+
+.btn {
+    transition: background-color 0.3s ease;
+}
+
+.btn.border {
+    border-color: #003049 !important;
+}
+
+.btn.text-primary:hover,
+.btn.text-primary:focus {
+    background-color: #C1121F !important;
+    color: #fff !important;
+    border-color: #C1121F !important;
+}
+
+.text-dark {
+    color: #780000 !important;
+}
+
+.position-absolute.bg-secondary {
+    background-color: #669BBC !important;
+    color: #fff;
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #FDF0D5;
+}
+::-webkit-scrollbar-thumb {
+    background-color: #C1121F;
+    border-radius: 20px;
+}
+.form-select:focus {
+    border-color: #C1121F !important;  /* Rojo claro */
+    box-shadow: 0 0 0 0.2rem rgba(193, 18, 31, 0.25) !important; /* sombra suave del mismo rojo */
+    outline: none;
+}
+
+.form-select {
+    background-color: #ffffff; /* fondo claro */
+    color: #003049;            /* texto azul oscuro */
+    border: 2px solid #003049;
+}
+
+.form-select option {
+    background-color: #FDF0D5; /* fondo del dropdown */
+    color: #003049;            /* texto en el dropdown */
+}
+
+.form-select option:checked {
+    background-color: #C1121F !important; /* rojo claro para opción activa */
+    color: #fff;
+}
+
+/* FIN CATALOGO */
