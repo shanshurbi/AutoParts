@@ -5,3 +5,4 @@ djangorestframework
 django-filter
 Pillow
 djangorestframework-simplejwt
+transbank-sdk
