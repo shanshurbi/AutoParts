@@ -155,3 +155,9 @@ AUTHENTICATION_BACKENDS = ['tienda.authentication.EmailBackend']
 
 FRONTEND_DIR = os.path.join(BASE_DIR, '..', 'frontend')
 TEMPLATES[0]['DIRS'] = [os.path.join(BASE_DIR, '..', 'frontend', 'templates')]
+
+TRANSBANK_WEBPAY_PLUS = {
+    'commerce_code': '597055555532',  # Código de comercio de integración
+    'api_key': '597055555532',        # Para Webpay Plus, se usa el mismo
+    'environment': 'integration',     # 'integration' o 'production'
+}

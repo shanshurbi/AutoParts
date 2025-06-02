@@ -249,7 +249,6 @@ class TrabajadoresAdminView(APIView):
     permission_classes = [IsAdminUser]  # Solo admins
 
     def get(self, request):
-        # Listar usuarios con su perfil trabajador
         perfiles = PerfilUsuario.objects.select_related('user').all()
         data = []
         for perfil in perfiles:
@@ -258,22 +257,30 @@ class TrabajadoresAdminView(APIView):
                 'username': perfil.user.username,
                 'email': perfil.user.email,
                 'trabajador': perfil.trabajador,
+                'empresa': perfil.empresa,
             })
         return Response(data)
 
-    def post(self, request):
-        # Modificar campo trabajador de un usuario
+    def patch(self, request):
         user_id = request.data.get('user_id')
         trabajador = request.data.get('trabajador')
-        if user_id is None or trabajador is None:
-            return Response({'error': 'Faltan datos'}, status=status.HTTP_400_BAD_REQUEST)
+        empresa = request.data.get('empresa')
+
+        if user_id is None:
+            return Response({'error': 'Falta user_id'}, status=status.HTTP_400_BAD_REQUEST)
+
         try:
             perfil = PerfilUsuario.objects.get(user_id=user_id)
-            perfil.trabajador = trabajador
-            perfil.save()
-            return Response({'success': True})
         except PerfilUsuario.DoesNotExist:
             return Response({'error': 'Usuario no encontrado'}, status=status.HTTP_404_NOT_FOUND)
+
+        if trabajador is not None:
+            perfil.trabajador = trabajador
+        if empresa is not None:
+            perfil.empresa = empresa
+
+        perfil.save()
+        return Response({'success': True})
 
 def admin_required(user):
     return user.is_authenticated and user.is_staff 
@@ -289,17 +296,27 @@ class TrabajadorUpdateView(APIView):
     def patch(self, request, user_id):
         try:
             user = User.objects.get(id=user_id)
-            perfil = user.perfilusuario  # O como se llame la relación OneToOne
+            perfil = user.perfilusuario  # Relación OneToOne
         except User.DoesNotExist:
             return Response({'error': 'Usuario no encontrado'}, status=status.HTTP_404_NOT_FOUND)
         except PerfilUsuario.DoesNotExist:
             return Response({'error': 'Perfil no encontrado'}, status=status.HTTP_404_NOT_FOUND)
 
-        trabajador = request.data.get('trabajador')
-        if trabajador is None:
-            return Response({'error': 'Campo trabajador es requerido'}, status=status.HTTP_400_BAD_REQUEST)
+        actualizado = False
 
-        perfil.trabajador = trabajador
+        trabajador = request.data.get('trabajador')
+        if trabajador is not None:
+            perfil.trabajador = trabajador
+            actualizado = True
+
+        empresa = request.data.get('empresa')
+        if empresa is not None:
+            perfil.empresa = empresa
+            actualizado = True
+
+        if not actualizado:
+            return Response({'error': 'No se proporcionó ningún campo válido'}, status=status.HTTP_400_BAD_REQUEST)
+
         perfil.save()
         return Response({'success': 'Estado actualizado'}, status=status.HTTP_200_OK)
     

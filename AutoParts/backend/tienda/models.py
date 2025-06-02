@@ -70,6 +70,7 @@ class CarritoItem(models.Model):
 class PerfilUsuario(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     trabajador = models.BooleanField(default=False)
+    empresa = models.BooleanField(db_default=False)
 
     def __str__(self):
         return self.user.username
