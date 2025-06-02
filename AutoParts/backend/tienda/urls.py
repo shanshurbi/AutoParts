@@ -27,4 +27,10 @@ urlpatterns=[
     path("api/login/from-session/", TokenDesdeSesionView.as_view(), name="token_desde_sesion"),
     path("login/form/", views.login_con_sesion, name="login-con-sesion"),
     path('logout/', cerrar_sesion, name='logout'),
+    path('carrito/aumentar/<int:producto_id>/', views.aumentar_producto, name='carrito-aumentar'),
+    path('carrito/disminuir/<int:producto_id>/', views.disminuir_producto, name='carrito-disminuir'),
+    path('carrito/remover/<int:producto_id>/', views.remover_producto, name='carrito-remover'),
+    path('pago_exitoso/', views.pago_exitoso, name='pago_exitoso'),
+    path("crear_pedido/", views.crear_pedido, name="crear_pedido"),
+    path("pagar/<str:order_id>/", views.pagar_view, name="pagar_transbank"),
 ]

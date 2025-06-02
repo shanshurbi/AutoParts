@@ -66,6 +66,7 @@ class CarritoItem(models.Model):
     
     def subtotal(self):
         return self.producto.precio * self.cantidad
+    
 
 class PerfilUsuario(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)

@@ -1,3 +1,6 @@
+from pyexpat.errors import messages
+import uuid
+from django.urls import reverse
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status, permissions
@@ -5,7 +8,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.parsers import MultiPartParser, FormParser
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from django.contrib.auth import login
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth import authenticate
@@ -15,18 +18,31 @@ from django.http import JsonResponse
 from django.conf import settings
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
-
+from transbank.webpay.webpay_plus.transaction import Transaction,WebpayOptions
+from transbank.common.integration_type import IntegrationType
 from .models import Producto, Vehiculo, Categoria, Carrito, CarritoItem, PerfilUsuario
 from .serializers import ProductoSerializer, VehiculoSerializer
 from django.contrib.auth import logout
 import re, os
+import random
+import string
 
+CommerCode = '597055555532'
+ApiKeySecret = '579B532A7440BB0C9079DED94D31EA1615BACEB56610332264630D42D0A36B1C'
+options = WebpayOptions(CommerCode,ApiKeySecret,IntegrationType.TEST)
+transaction = Transaction(options)
 # Create your views here.
 
 def lista_productos(request):
     productos = Producto.objects.all()
     return render(request,'productos.html', {'productos':productos})
-
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def perfil_usuario(request):
+    return Response({
+        "usuario": request.user.username,
+        "email": request.user.email
+    })
 class ProductoAPIView(APIView):
     permission_classes = [AllowAny]  # Puedes usar permisos más restrictivos si deseas
 
@@ -71,7 +87,8 @@ def cerrar_sesion(request):
     response.delete_cookie('sessionid')  # Elimina la cookie en el navegador
     return response
 
-
+def generar_order_id():
+    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=20))
 class LoginView(APIView):
     permission_classes = [AllowAny]
     def post(self, request):  
@@ -419,11 +436,142 @@ def cerrar_sesion(request):
     logout(request)
     return render(request, 'logout.html')
 
-@api_view(['GET'])
-def login_from_session(request):
-    if not request.user.is_authenticated:
-        return Response({'detail': 'Sesión no activa'}, status=401)
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def aumentar_producto(request, producto_id):
+    print("➡️ aumentar_producto()")
+    carrito, _ = Carrito.objects.get_or_create(user=request.user, is_active=True)
 
-    # Si quieres que genere un token cuando el usuario sigue autenticado por sesión:
-    # Aquí podrías devolver el token, pero solo si lo necesitas.
-    return Response({'detail': 'Sesión activa pero no se generará token'}, status=403)
+    item, created = CarritoItem.objects.get_or_create(
+        carrito=carrito,
+        producto_id=producto_id,
+        defaults={'cantidad': 1}
+    )
+
+    if not created:
+        item.cantidad += 1
+        item.save()
+        print(f"🟢 Cantidad actualizada: {item.cantidad}")
+    else:
+        print("🆕 Producto agregado al carrito")
+
+    return Response({"detalle": "Cantidad aumentada"})
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def disminuir_producto(request, producto_id):
+    print("➡️ disminuir_producto()")
+    item = get_object_or_404(CarritoItem, carrito__user=request.user, producto_id=producto_id)
+
+    if item.cantidad > 1:
+        item.cantidad -= 1
+        item.save()
+        print(f"🔽 Cantidad disminuida a: {item.cantidad}")
+    else:
+        item.delete()
+        print("🗑️ Producto eliminado por cantidad = 0")
+
+    return Response({"detalle": "Cantidad disminuida"})
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def remover_producto(request, producto_id):
+    print("➡️ remover_producto()")
+    item = get_object_or_404(CarritoItem, carrito__user=request.user, producto_id=producto_id)
+    item.delete()
+    print("🧹 Producto eliminado del carrito")
+
+    return Response({"detalle": "Producto eliminado"})
+
+def pagar_transbank(request, order_id):
+    cart = request.session.get("cart", [])
+    user_id = request.user.get("user_id")
+    cliente = request.session.get("cliente", {})
+    resumen = request.session.get("resumen", {})
+    session_id = f"{user_id}-{uuid.uuid4()}"
+    return_url = request.build_absolute_uri(f"/carrito/confirmar/")  # Donde llegará después del pago
+
+    if not cart or not user_id:
+        return Response({"error": "Datos de sesión no encontrados"}, status=400)
+
+    # Calcula total
+    total = sum(item["precio"] * item["cantidad"] for item in cart)
+
+    tx = Transaction()
+    tx.configure_for_testing()  # ⚠️ Cambia a producción cuando estés listo
+
+    response = tx.create(buy_order=order_id, session_id=session_id, amount=total, return_url=return_url)
+
+    url = response["url"] + "?token_ws=" + response["token"]
+    return Response({"url": url})
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def crear_pedido(request):
+    data = request.data
+    user = request.user
+
+    email = data.get("email")
+    monto = data.get("monto")
+    metodo = data.get("metodo_pago")
+
+    if not email or not monto or not metodo:
+        return Response({"error": "Faltan datos para crear el pedido"}, status=400)
+
+    order_id = generar_order_id()
+    request.session["order_id"] = order_id
+    request.session["email"] = email
+    request.session["monto"] = monto
+    request.session["metodo_pago"] = metodo
+    request.session["user_id"] = user.id
+
+    return Response({"order_id": order_id})
+@login_required
+def pagar_view(request, order_id):
+    print("💡 order_id recibido:", order_id)
+
+    email = request.session.get("email")
+    monto = request.session.get("monto")
+    metodo = request.session.get("metodo_pago")
+
+    if not email or not monto or not metodo:
+        print("❌ Datos de sesión incompletos:")
+        print("email:", email)
+        print("monto:", monto)
+        print("metodo:", metodo)
+        return redirect("/carrito/")
+
+    try:
+        session_id = f"{request.user.id}-{uuid.uuid4()}"
+        return_url = request.build_absolute_uri("/carrito/confirmar/")
+
+        response = transaction.create(
+            buy_order=order_id,
+            session_id=session_id,
+            amount=int(monto),
+            return_url=return_url
+        )
+
+        # Redirige a la URL que devuelve Transbank
+        url = response["url"] + "?token_ws=" + response["token"]
+        return redirect(url)
+
+    except Exception as e:
+        print("❌ Error al crear la transacción:", e)
+        return redirect("/carrito/")
+def pago_exitoso(request):
+    
+    token_ws = request.GET.get('token_ws')  
+    transaction = Transaction(options) 
+    result = transaction.commit(token_ws)  
+
+    if result['status'] == 'AUTHORIZED':
+  
+        pedido_id = int(result['buy_order'])  
+        pedido = get_object_or_404(CarritoItem, id=pedido_id)  
+        pedido.estado = 'pagado' 
+        pedido.save()
+
+        return render(request, 'autopart/pago_exitoso.html', {'pedido': pedido})
+    else:
+        return render(request, 'autopart/pago_fallido.html') 

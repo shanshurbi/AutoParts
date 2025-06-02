@@ -37,14 +37,14 @@ document.addEventListener("DOMContentLoaded", () => {
                             <h4>${p.nombre}</h4>
                             <p>${p.descripcion}</p>
                             <div class="d-flex justify-content-between flex-lg-wrap">
-                                <p class="text-dark fs-5 fw-bold mb-0">$${p.precio}</p>
-                                <button onclick="agregarAlCarrito(${p.id})" class="btn border border-secondary rounded-pill px-3 text-primary">
-                                <i class="fa fa-shopping-bag me-2 text-primary"></i> Añadir al carro
-                                </button>
+                                <p class="text-dark fs-5 fw-bold mb-0">${p.precio.toLocaleString("es-CL", { style: "currency", currency: "CLP" })}</p>
                             </div>
                             </div>
                         </div>
                         </a>
+                        <button onclick="agregarAlCarrito(${p.id})" class="btn border border-secondary rounded-pill px-3 text-primary">
+                                <i class="fa fa-shopping-bag me-2 text-primary"></i> Añadir al carro
+                         </button>
                     </div>`;
                     container.innerHTML += card;
                 });
@@ -117,3 +117,4 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
         }
+        

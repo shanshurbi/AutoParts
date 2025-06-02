@@ -50,13 +50,27 @@
                 <!-- Productos cargados aquí por JavaScript -->
               </tbody>
             </table>
+           <!-- Campo oculto con email -->
+              <input type="hidden" id="userEmail" value="{{ request.user.email }}">
 
-          </div>
+              <!-- Método de pago -->
+              <select id="metodoPago" class="form-select mb-3">
+                <option value="">Selecciona un método</option>
+                <option value="tarjeta">Tarjeta (Webpay)</option>
+                <option value="transferencia" disabled>Transferencia (próximamente)</option>
+              </select>
+
+              <!-- Botón -->
+              <div class="d-flex justify-content-end align-items-center">
+                <button id="btnConfirmarPago" class="btn btn-primary">Ir a pagar</button>
+              </div>
+
         </div>
       </div>
     </main>
 
     {% include "base/footer.html" %}
     <script src="{% static 'js/carrito.js' %}"></script>
+
 </body>
 </html>

@@ -52,9 +52,15 @@
         <a href="#" id="carrito-icon" class="position-relative me-4 my-auto">
             <i class="fa fa-shopping-bag fa-2x icono-principal"></i>
         </a>
-        <a id="login-icon" href="{% url 'login' %}" class="my-auto">
+        {% if user.is_authenticated %}
+        <a id="login-icon" href="{% url 'perfil' %}" class="my-auto">
             <i class="fas fa-user fa-2x icono-principal"></i>
         </a>
+        {% else %}
+        <a id="login-icon" href="{% url 'login' %}" class="my-auto">
+            <i class="fas fa-sign-in-alt fa-2x icono-principal"></i>
+        </a>
+        {% endif %}
     </div>
 </div>
     </div>
