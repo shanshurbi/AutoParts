@@ -65,34 +65,51 @@ function getCSRFToken() {
     return getCookie("csrftoken");
 }
 
-function verificarSesionYRedirigir(event, destino) {
+async function verificarSesionYRedirigir(event, destino) {
     event.preventDefault();
-    const token = localStorage.getItem("token");
 
-    if (token) {
-        // Validar token con la API
-        fetch("/api/perfil/", {
-            headers: {
-                "Authorization": `Token ${token}`
-            }
-        })
-        .then(response => {
+    let token = localStorage.getItem("token");
+
+    if (!token) {
+        // Si no hay token, intentamos obtenerlo desde la sesión activa
+        try {
+            const response = await fetch("/api/login/from-session/", {
+                method: "GET",
+                credentials: "include"
+            });
+
             if (response.ok) {
-                window.location.href = destino;
+                const data = await response.json();
+                token = data.token;
+                localStorage.setItem("token", token);
             } else {
-                localStorage.removeItem("token");
                 window.location.href = "/login";
+                return;
             }
-        })
-        .catch(() => {
+        } catch (error) {
+            console.error("Error al obtener token desde sesión:", error);
             window.location.href = "/login";
+            return;
+        }
+    }
+
+    // Validar el token recibido
+    try {
+        const validar = await fetch("/api/perfil/", {
+            headers: { "Authorization": `Token ${token}` }
         });
-    } else {
+
+        if (validar.ok) {
+            window.location.href = destino;
+        } else {
+            localStorage.removeItem("token");
+            window.location.href = "/login";
+        }
+    } catch (error) {
+        console.error("Error al validar token:", error);
         window.location.href = "/login";
     }
-}
-
-document.addEventListener("DOMContentLoaded", function () {
+}document.addEventListener("DOMContentLoaded", function () {
     const carritoLink = document.getElementById("carrito-link");
     const carritoIcon = document.getElementById("carrito-icon");
 
