@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from .views import ProductoAPIView, HomeView, LoginView, login_page, catalogo_view, RegistroView, registro_page, PerfilUsuarioView, perfil_page, detalle_producto, CarritoView, AgregarCarritoView, RemoverDelCarritoView, carrito_page, CarritoContadorView, TrabajadoresAdminView, gestion_page, TrabajadorUpdateView, ProductoDetalleAPIView, gestion_prod_page
+from .views import ProductoAPIView, HomeView, LoginView, cerrar_sesion, login_page, catalogo_view, RegistroView, registro_page, PerfilUsuarioView, perfil_page, detalle_producto, CarritoView, AgregarCarritoView, RemoverDelCarritoView, carrito_page, CarritoContadorView, TrabajadoresAdminView, gestion_page, TrabajadorUpdateView, ProductoDetalleAPIView, gestion_prod_page
 from tienda.views import TokenDesdeSesionView
 
 urlpatterns=[
@@ -26,4 +26,5 @@ urlpatterns=[
     path('gestion_productos', gestion_prod_page, name='gestion_productos'),
     path("api/login/from-session/", TokenDesdeSesionView.as_view(), name="token_desde_sesion"),
     path("login/form/", views.login_con_sesion, name="login-con-sesion"),
+    path('logout/', cerrar_sesion, name='logout'),
 ]

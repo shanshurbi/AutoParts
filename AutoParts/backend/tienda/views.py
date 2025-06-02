@@ -5,7 +5,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.parsers import MultiPartParser, FormParser
-
+from rest_framework.decorators import api_view
 from django.contrib.auth import login
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth import authenticate
@@ -18,7 +18,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from .models import Producto, Vehiculo, Categoria, Carrito, CarritoItem, PerfilUsuario
 from .serializers import ProductoSerializer, VehiculoSerializer
-
+from django.contrib.auth import logout
 import re, os
 
 # Create your views here.
@@ -65,6 +65,12 @@ class HomeView(APIView):
         print("Buscando template en:", full_path)
         print("¿Existe archivo?", os.path.exists(full_path))
         return render(request, 'home.html')
+def cerrar_sesion(request):
+    logout(request)  # Elimina la sesión del lado del servidor
+    response = JsonResponse({'mensaje': 'Sesión cerrada'})
+    response.delete_cookie('sessionid')  # Elimina la cookie en el navegador
+    return response
+
 
 class LoginView(APIView):
     permission_classes = [AllowAny]
@@ -409,3 +415,15 @@ def login_con_sesion(request):
             return render(request, 'login.html', {'error': 'Credenciales inválidas'})
 
     return render(request, 'login.html')
+def cerrar_sesion(request):
+    logout(request)
+    return render(request, 'logout.html')
+
+@api_view(['GET'])
+def login_from_session(request):
+    if not request.user.is_authenticated:
+        return Response({'detail': 'Sesión no activa'}, status=401)
+
+    # Si quieres que genere un token cuando el usuario sigue autenticado por sesión:
+    # Aquí podrías devolver el token, pero solo si lo necesitas.
+    return Response({'detail': 'Sesión activa pero no se generará token'}, status=403)

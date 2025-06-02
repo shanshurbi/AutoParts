@@ -1,3 +1,7 @@
 django-rest-framework
 django-crispy-forms
 crispy-bootstrap5
+djangorestframework
+django-filter
+Pillow
+djangorestframework-simplejwt

@@ -40,7 +40,8 @@
             <p><strong>Usuario:</strong> <span id="username"></span></p>
             <p><strong>Email:</strong> <span id="email"></span></p>
 
-            <button id="logout-btn" class="btn btn-danger rounded-pill px-4 py-2">Cerrar sesión</button>
+            <button id="logout-btn" class="btn btn-outline-danger w-100 mt-3">Cerrar sesión</button>
+
         </div>
         </div>
     </div>
@@ -49,34 +50,33 @@
 
     {% include "base/footer.html" %}
     <script>
-    document.addEventListener("DOMContentLoaded", async function () {
-    const token = localStorage.getItem("token");
+document.addEventListener("DOMContentLoaded", async function () {
+  const token = localStorage.getItem("token");
 
-    if (!token) {
-      window.location.href = "{% url 'login' %}";
-      return;
-    }
+  if (!token) {
+    window.location.href = "{% url 'login' %}";
+    return;
+  }
 
+  try {
     const response = await fetch("/api/perfil/", {
       headers: {
         "Authorization": "Token " + token
       }
     });
 
-    if (!response.ok) {
-      localStorage.removeItem("token");
-      window.location.href = "{% url 'login' %}";
-      return;
-    }
+    if (!response.ok) throw new Error("Token inválido");
 
     const data = await response.json();
     document.getElementById("username").textContent = data.usuario;
     document.getElementById("email").textContent = data.email;
-  });
-
-  document.getElementById('logout-btn').addEventListener('click', () => {
-    localStorage.removeItem('token');
-    window.location.href = "/";
-  });</script>
+  } catch (error) {
+    console.error("Error al cargar el perfil:", error);
+    localStorage.removeItem("token");
+    window.location.href = "{% url 'login' %}";
+  }
+});
+</script>
+  <script src="{% static 'js/logout.js' %}"></script>
 </body>
 </html>

@@ -16,7 +16,8 @@ function getCookie(name) {
 async function asegurarToken() {
   let token = localStorage.getItem("token");
 
-  if (!token) {
+  // Validación más estricta del token
+  if (!token || token === "undefined" || token === "null" || token.trim() === "") {
     try {
       const response = await fetch("/api/login/from-session/", {
         method: "GET",
@@ -28,17 +29,23 @@ async function asegurarToken() {
         token = data.token;
         localStorage.setItem("token", token);
       } else {
-        window.location.href = "/login/";
+        limpiarSesionYRedirigir();
         return null;
       }
     } catch (error) {
       console.error("Error al recuperar token:", error);
-      window.location.href = "/login/";
+      limpiarSesionYRedirigir();
       return null;
     }
   }
 
   return token;
+}
+
+function limpiarSesionYRedirigir() {
+  localStorage.removeItem("token");
+  sessionStorage.clear();
+  window.location.href = "/login/";
 }
 
 function eliminarDelCarrito(productoId) {
@@ -67,8 +74,12 @@ function eliminarDelCarrito(productoId) {
 document.addEventListener("DOMContentLoaded", async function () {
   const token = await asegurarToken();
 
-  if (!token) return;
-
+  if (!token) {
+    // Borra también el carrito por si quedó algo
+    localStorage.removeItem("carrito");
+    window.location.href = "{% url 'login' %}";
+    return;
+  }
   try {
     const response = await fetch("/api/carrito/", {
       headers: {
@@ -109,7 +120,6 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   } catch (error) {
     console.error("Error al cargar el carrito:", error);
-    localStorage.removeItem("token");
-    window.location.href = "/login/";
+    limpiarSesionYRedirigir();
   }
 });
