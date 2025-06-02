@@ -44,8 +44,8 @@ function cargarProductos() {
             <td>${p.stock}</td>
             <td><img src="${p.imagen || ''}" alt="${p.nombre}" style="max-height: 50px;"></td>
             <td>
-              <button class="btn btn-sm btn-warning me-1" onclick="mostrarFormularioModificar(${p.id})">Modificar</button>
-              <button class="btn btn-sm btn-danger" onclick="eliminarProducto(${p.id})">Eliminar</button>
+              <button class="btn-editar me-1" onclick="mostrarFormularioModificar(${p.id})">Modificar</button>
+              <button class="btn-eliminar" onclick="eliminarProducto(${p.id})">Eliminar</button>
             </td>
           </tr>
         `;

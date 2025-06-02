@@ -619,4 +619,4 @@ def pago_exitoso(request):
         })
 
     else:
-        return render(request, "autopart/pago_fallido.html")
+        return render(request, "carrito.html")

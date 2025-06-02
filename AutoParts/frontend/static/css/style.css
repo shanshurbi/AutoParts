@@ -1048,3 +1048,323 @@ h1, h4, label {
   color: #fff;
 }
 /* FIN PERFIL */
+
+/* CARRITO */
+/* Fondo del carrito */
+main {
+  background-color: #FDF0D5;
+  padding-bottom: 80px;
+}
+
+/* Contenedor principal */
+.carrito-card {
+  background-color: white;
+  border: 2px solid #669BBC;
+  border-radius: 16px;
+}
+
+/* Título */
+.carrito-card h3 {
+  color: #003049;
+  font-weight: 700;
+}
+
+/* Tabla */
+.table {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.table th {
+  background-color: #003049 !important;
+  color: #FDF0D5 !important;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.table td {
+  vertical-align: middle;
+  text-align: center;
+}
+
+/* Botón de pagar */
+#btnConfirmarPago {
+  background-color: #780000;
+  color: #FDF0D5;
+  font-weight: bold;
+  border-radius: 50px;
+  padding: 10px 25px;
+  border: none;
+  transition: background-color 0.3s ease;
+}
+
+#btnConfirmarPago:hover {
+  background-color: #C1121F;
+}
+
+/* Select método de pago */
+#metodoPago {
+  border: 2px solid #003049;
+  color: #003049;
+  border-radius: 8px;
+}
+
+#metodoPago:focus {
+  border-color: #C1121F;
+  box-shadow: 0 0 0 0.2rem rgba(193, 18, 31, 0.25);
+  outline: none;
+}
+
+/* Mensaje de carrito vacío */
+#mensaje-vacio {
+  text-align: center;
+  color: #C1121F;
+  font-weight: bold;
+  margin-top: 40px;
+}
+
+.btn-cantidad {
+  border: 2px solid #780000;
+  color: #780000;
+  background-color: transparent;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.btn-cantidad:hover {
+  background-color: #C1121F;
+  color: #FDF0D5;
+  border-color: #C1121F;
+}
+
+/* Botón eliminar */
+.btn-eliminar {
+  background-color: transparent;
+  border: 2px solid #C1121F;
+  color: #C1121F;
+  border-radius: 8px;
+  padding: 6px 12px;
+  transition: background-color 0.3s ease;
+}
+
+.btn-eliminar:hover {
+  background-color: #C1121F;
+  color: white;
+}
+
+/* FIN CARRITO */
+
+/* GESTIÓN DE PRODUCTOSSS */
+/* Fondo general */
+main {
+  background-color: #FDF0D5;
+  padding-bottom: 60px;
+}
+
+/* Contenedor principal */
+.gestion-card {
+  background-color: white;
+  border-radius: 16px;
+  border: 2px solid #669BBC;
+}
+
+/* Título */
+.gestion-card h3 {
+  color: #003049;
+  font-weight: 700;
+  text-align: center;
+}
+
+/* Inputs y selects */
+.form-control,
+.form-select {
+  border: 2px solid #003049;
+  border-radius: 8px;
+  transition: border-color 0.3s ease;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: #C1121F;
+  box-shadow: 0 0 0 0.2rem rgba(193, 18, 31, 0.2);
+}
+
+/* Botón principal */
+button[type="submit"] {
+  background-color: #780000;
+  color: #FDF0D5;
+  font-weight: bold;
+  border: none;
+  border-radius: 50px;
+  transition: background-color 0.3s ease;
+  padding: 10px 20px;
+}
+
+button[type="submit"]:hover {
+  background-color: #C1121F;
+  color: #fff;
+}
+
+/* Tabla */
+.table {
+  margin-top: 30px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.table th {
+  background-color: #003049 !important;
+  color: #FDF0D5 !important;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.table td {
+  text-align: center;
+  vertical-align: middle;
+}
+
+/* Acciones (botones dentro de la tabla) */
+.btn-editar,
+.btn-eliminar {
+  padding: 6px 10px;
+  font-weight: bold;
+  border-radius: 6px;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+  margin: 2px;
+}
+
+.btn-editar {
+  background-color: transparent;
+  color: #003049;
+  border-color: #669BBC;
+}
+
+.btn-editar:hover {
+  background-color: #669BBC;
+  color: white;
+}
+
+.btn-eliminar {
+  background-color: transparent;
+  color: #C1121F;
+  border-color: #C1121F;
+}
+
+.btn-eliminar:hover {
+  background-color: #C1121F;
+  color: white;
+}
+
+/* Botón editar */
+.btn-editar {
+  background-color: transparent;
+  color: #003049;
+  border: 2px solid #669BBC;
+  border-radius: 6px;
+  font-weight: bold;
+  padding: 6px 12px;
+  transition: all 0.3s ease;
+  margin: 2px;
+}
+
+.btn-editar:hover {
+  background-color: #669BBC;
+  color: white;
+}
+
+/* Botón eliminar */
+.btn-eliminar {
+  background-color: transparent;
+  color: #C1121F;
+  border: 2px solid #C1121F;
+  border-radius: 6px;
+  font-weight: bold;
+  padding: 6px 12px;
+  transition: all 0.3s ease;
+  margin: 2px;
+}
+
+.btn-eliminar:hover {
+  background-color: #C1121F;
+  color: white;
+}
+/* fin de gestión  */
+
+/* GESTIÓN TRABAJADORES */
+
+/* Contenedor general */
+main {
+  background-color: #FDF0D5;
+  padding-bottom: 60px;
+}
+
+/* Card */
+.gestion-card {
+  background-color: white;
+  border: 2px solid #669BBC;
+  border-radius: 16px;
+}
+
+/* Título */
+.gestion-card h3 {
+  color: #003049;
+  font-weight: bold;
+}
+
+/* Tabla */
+.table {
+  margin-top: 20px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.table th {
+  background-color: #003049 !important;
+  color: #FDF0D5 !important;
+  text-align: center;
+}
+
+.table td {
+  text-align: center;
+  vertical-align: middle;
+}
+
+/* Botón trabajador (activo/inactivo) */
+.btn-trabajador {
+  font-weight: bold;
+  border: 2px solid #003049;
+  color: #003049;
+  background-color: transparent;
+  border-radius: 6px;
+  padding: 6px 12px;
+  transition: all 0.3s ease;
+  margin: 2px;
+}
+
+.btn-trabajador:hover {
+  background-color: #003049;
+  color: white;
+}
+
+/* Botón empresa (activo/inactivo) */
+.btn-empresa {
+  font-weight: bold;
+  border: 2px solid #C1121F;
+  color: #C1121F;
+  background-color: transparent;
+  border-radius: 6px;
+  padding: 6px 12px;
+  transition: all 0.3s ease;
+  margin: 2px;
+}
+
+.btn-empresa:hover {
+  background-color: #C1121F;
+  color: white;
+}

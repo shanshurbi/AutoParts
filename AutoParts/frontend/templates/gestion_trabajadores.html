@@ -87,11 +87,11 @@
       <td>${user.trabajador ? 'Sí' : 'No'}</td>
       <td>${user.empresa ? 'Sí' : 'No'}</td> <!-- NUEVA COLUMNA -->
       <td>
-        <button class="btn btn-sm ${user.trabajador ? 'btn-danger' : 'btn-success'}" 
+        <button class="btn btn-sm btn-trabajador ${user.trabajador ? 'btn-trabajador' : 'btn-trabajador'}" 
           onclick="toggleTrabajador('${user.id}', ${user.trabajador})">
           ${user.trabajador ? 'Quitar trabajador' : 'Asignar trabajador'}
         </button>
-        <button class="btn btn-sm ${user.empresa ? 'btn-danger' : 'btn-primary'}"
+        <button class="btn btn-sm ${user.empresa ? 'btn-empresa' : 'btn-empresa'}"
           onclick="toggleEmpresa('${user.id}', ${user.empresa})">
           ${user.empresa ? 'Quitar empresa' : 'Asignar empresa'}
         </button>

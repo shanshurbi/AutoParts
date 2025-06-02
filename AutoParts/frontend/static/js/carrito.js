@@ -124,19 +124,16 @@ function actualizarTablaCarrito(items) {
       <td>${item.precio.toLocaleString("es-CL", { style: "currency", currency: "CLP" })}</td>
       <td>
         <div class="d-flex justify-content-center align-items-center">
-          <button class="btn btn-sm btn-outline-danger px-2 me-2" onclick="cambiarCantidad(${item.producto_id}, 'disminuir')">
+          <button class="btn-cantidad restar px-2 me-2" onclick="cambiarCantidad(${item.producto_id}, 'disminuir')">
             <strong>-</strong>
           </button>
           <span class="mx-2 fw-bold">${item.cantidad}</span>
-          <button class="btn btn-sm btn-outline-success px-2 ms-2" onclick="cambiarCantidad(${item.producto_id}, 'aumentar')">
+          <button class="btn-cantidad sumar px-2 ms-2" onclick="cambiarCantidad(${item.producto_id}, 'aumentar')">
             <strong>+</strong>
           </button>
         </div>
       </td>
       <td>${subtotal.toLocaleString("es-CL", { style: "currency", currency: "CLP" })}</td>
-      <td>
-        <button onclick="eliminarDelCarrito(${item.producto_id})" class="btn btn-danger btn-sm">Eliminar</button>
-      </td>
     `;
 
     tbody.appendChild(fila);
