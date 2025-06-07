@@ -1,9 +1,32 @@
-document.addEventListener("DOMContentLoaded", async function () {
-  const token = localStorage.getItem("token");
-
-  if (!token) {
-    return window.location.href = "/login/";
+async function asegurarToken() {
+  let token = localStorage.getItem("token");
+  if (!token || token === "undefined" || token === "null" || token.trim() === "") {
+    try {
+      const response = await fetch("/api/login/from-session/", {
+        method: "GET",
+        credentials: "include"
+      });
+      if (response.ok) {
+        const data = await response.json();
+        token = data.token;
+        localStorage.setItem("token", token);
+      } else {
+        localStorage.removeItem("token");
+        window.location.href = "/login/";
+        return null;
+      }
+    } catch (error) {
+      localStorage.removeItem("token");
+      window.location.href = "/login/";
+      return null;
+    }
   }
+  return token;
+}
+
+document.addEventListener("DOMContentLoaded", async function () {
+  const token = await asegurarToken();
+  if (!token) return;
 
   try {
     const response = await fetch("/api/perfil/", {
@@ -14,7 +37,8 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     if (!response.ok) {
       localStorage.removeItem("token");
-      return window.location.href = "/perfil/";
+      window.location.href = "/login/";
+      return;
     }
 
     const data = await response.json();

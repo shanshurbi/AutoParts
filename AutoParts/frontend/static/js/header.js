@@ -2,36 +2,52 @@ document.addEventListener("DOMContentLoaded", function () {
   const loginIcon = document.getElementById("login-icon");
 
   if (loginIcon) {
-    loginIcon.addEventListener("click", async function (e) {
-      e.preventDefault();
+  loginIcon.addEventListener("click", async function (e) {
+    e.preventDefault();
 
-      const token = localStorage.getItem("token");
+    let token = localStorage.getItem("token");
 
-      if (token) {
-        try {
-          const response = await fetch("/api/perfil/", {
-            headers: {
-              "Authorization": `Token ${token}`
-            }
-          });
-
-          if (response.ok) {
-            // 😈 Maldad: ir primero al carrito y luego al perfil
-            localStorage.setItem("redirectAfterCarrito", "/perfil");
-            window.location.href = "/carrito/";
-          } else {
-            localStorage.removeItem("token");
-            window.location.href = "/login";
-          }
-        } catch (error) {
-          console.error("Error al validar token:", error);
+    if (!token || token === "undefined" || token === "null" || token.trim() === "") {
+      try {
+        const response = await fetch("/api/login/from-session/", {
+          method: "GET",
+          credentials: "include"
+        });
+        if (response.ok) {
+          const data = await response.json();
+          token = data.token;
+          localStorage.setItem("token", token);
+        } else {
+          localStorage.removeItem("token");
           window.location.href = "/login";
+          return;
         }
+      } catch (error) {
+        localStorage.removeItem("token");
+        window.location.href = "/login";
+        return;
+      }
+    }
+
+    try {
+      const response = await fetch("/api/perfil/", {
+        headers: {
+          "Authorization": `Token ${token}`
+        }
+      });
+
+      if (response.ok) {
+        window.location.href = "/perfil";
       } else {
+        localStorage.removeItem("token");
         window.location.href = "/login";
       }
-    });
-  }
+    } catch (error) {
+      console.error("Error al validar token:", error);
+      window.location.href = "/login";
+    }
+  });
+}
 
   const carritoLink = document.getElementById("carrito-link");
   const carritoIcon = document.getElementById("carrito-icon");
