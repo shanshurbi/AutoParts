@@ -75,8 +75,10 @@
     {% include "base/footer.html" %}
     <script>
     const CSRF_TOKEN = "{{ csrf_token }}";  // si necesitas token
-    const URL_PRODUCTOS_API = "{% url 'lista-productos-api' %}";  // o la url que necesites
+    const URL_PRODUCTOS_API = "{% url 'lista-productos-api' %}";
+     // o la url que necesites
     </script>
     <script src="{% static 'js/gestion_productos.js' %}"></script>
+    
 </body>
 </html>
