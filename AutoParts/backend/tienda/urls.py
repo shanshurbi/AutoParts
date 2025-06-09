@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from .views import ProductoAPIView, HomeView, LoginView, cerrar_sesion, login_page, catalogo_view, RegistroView, registro_page, PerfilUsuarioView, perfil_page, detalle_producto, CarritoView, AgregarCarritoView, RemoverDelCarritoView, carrito_page, CarritoContadorView, TrabajadoresAdminView, gestion_page, TrabajadorUpdateView, ProductoDetalleAPIView, gestion_prod_page
+from .views import ProductoAPIView, HomeView, LoginView, ProductoMayoristaAPIView, cerrar_sesion, login_page, catalogo_view, RegistroView, registro_page, PerfilUsuarioView, perfil_page, detalle_producto, CarritoView, AgregarCarritoView, RemoverDelCarritoView, carrito_page, CarritoContadorView, TrabajadoresAdminView, gestion_page, TrabajadorUpdateView, ProductoDetalleAPIView, gestion_prod_page
 from tienda.views import TokenDesdeSesionView
 
 urlpatterns=[
@@ -33,4 +33,6 @@ urlpatterns=[
     path('pago_exitoso/', views.pago_exitoso, name='pago_exitoso'),
     path("crear_pedido/", views.crear_pedido, name="crear_pedido"),
     path("pagar/<str:order_id>/", views.pagar_view, name="pagar_transbank"),
+    path('api/productos/mayorista/', ProductoMayoristaAPIView.as_view(), name='api_productos_mayorista'),
+    path('productos/mayorista/', views.productos_mayoristas_page, name='productos_mayorista_page'),
 ]

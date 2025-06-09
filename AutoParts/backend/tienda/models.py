@@ -60,12 +60,13 @@ class CarritoItem(models.Model):
     carrito = models.ForeignKey(Carrito, related_name='items', on_delete=models.CASCADE)
     producto = models.ForeignKey('Producto', on_delete=models.CASCADE)
     cantidad = models.PositiveIntegerField(default=1)
+    precio = models.PositiveIntegerField(default=1) 
 
     def __str__(self):
         return f"{self.cantidad} x {self.producto.nombre}"
     
     def subtotal(self):
-        return self.producto.precio * self.cantidad
+        return self.precio * self.cantidad 
     
 
 class PerfilUsuario(models.Model):

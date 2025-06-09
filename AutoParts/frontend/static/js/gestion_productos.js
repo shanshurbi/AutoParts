@@ -1,3 +1,4 @@
+
 function getCookie(name) {
   let cookieValue = null;
   if (document.cookie && document.cookie !== '') {
@@ -43,8 +44,8 @@ function cargarProductos() {
             <td>${p.stock}</td>
             <td><img src="${p.imagen || ''}" alt="${p.nombre}" style="max-height: 50px;"></td>
             <td>
-              <button class="btn-editar me-1" data-id="${p.id}">Modificar</button>
-              <button class="btn-eliminar" data-id="${p.id}">Eliminar</button>
+              <button class="btn-editar me-1" onclick="mostrarFormularioModificar(${p.id})">Modificar</button>
+              <button class="btn-eliminar" onclick="eliminarProducto(${p.id})">Eliminar</button>
             </td>
           </tr>
         `;
@@ -63,32 +64,22 @@ function mostrarFormularioModificar(id) {
     .then(res => res.json())
     .then(p => {
       const form = document.getElementById('form-producto');
-      form.dataset.editId = id;
+      form.dataset.editId = id;  
 
       form.nombre.value = p.nombre;
       form.precio.value = p.precio;
       form.precio_mayorista.value = p.precio_mayorista;
       form.descripcion.value = p.descripcion;
       form.stock.value = p.stock;
-      form.categoria.value = p.categoria;
-
-      // Cambia el texto del botón (más robusto)
-      const submitBtn = document.querySelector('#form-producto button[type="submit"]');
-console.log('submitBtn:', submitBtn);
-if (submitBtn) submitBtn.textContent = 'Aplicar cambios';
-
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      form.categoria.value = p.categoria; 
     })
     .catch(console.error);
 }
+
 function limpiarFormulario() {
   const form = document.getElementById('form-producto');
   form.reset();
   delete form.dataset.editId;
-
-  // Restaura el texto del botón (más robusto)
-  const submitBtn = document.querySelector('#form-producto button[type="submit"]');
-  if (submitBtn) submitBtn.textContent = 'Agregar producto';
 }
 
 document.getElementById('form-producto').addEventListener('submit', function (e) {
@@ -150,17 +141,5 @@ function eliminarProducto(id) {
   })
   .catch(console.error);
 }
-
-// Delegación de eventos para los botones de la tabla
-document.addEventListener('click', function(e) {
-  if (e.target.classList.contains('btn-editar')) {
-    const id = e.target.getAttribute('data-id');
-    mostrarFormularioModificar(id);
-  }
-  if (e.target.classList.contains('btn-eliminar')) {
-    const id = e.target.getAttribute('data-id');
-    eliminarProducto(id);
-  }
-});
 
 document.addEventListener('DOMContentLoaded', cargarProductos);

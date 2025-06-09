@@ -1,23 +1,105 @@
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+async function asegurarToken() {
+    let token = localStorage.getItem("token");
+    if (!token || token === "undefined" || token === "null" || token.trim() === "") {
+        try {
+            const response = await fetch("/api/login/from-session/", {
+                method: "GET",
+                credentials: "include"
+            });
+            if (response.ok) {
+                const data = await response.json();
+                token = data.token;
+                localStorage.setItem("token", token);
+            } else {
+                localStorage.removeItem("token");
+                window.location.href = "/login/";
+                return null;
+            }
+        } catch (error) {
+            localStorage.removeItem("token");
+            window.location.href = "/login/";
+            return null;
+        }
+    }
+    return token;
+}
+
+async function agregarAlCarrito(productoId) {
+    const token = await asegurarToken();
+    if (!token) return;
+    fetch('/carrito/agregar/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken'),
+            'Authorization': 'Token ' + token
+        },
+        body: JSON.stringify({ producto_id: productoId }),
+        credentials: 'include'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error === 'No autenticado') {
+            window.location.href = '/login/';
+        } else if (data.error) {
+            alert(data.error);
+        } else {
+            alert('Producto agregado al carrito');
+            actualizarContadorCarrito();
+        }
+    })
+    .catch(err => {
+        console.error("Error:", err);
+        alert('Error al agregar producto');
+    });
+}
+
+function actualizarContadorCarrito() {
+    fetch('/carrito/contador/')
+        .then(res => res.json())
+        .then(data => {
+            const contador = document.getElementById('carrito-contador');
+            if (contador) {
+                contador.innerText = data.cantidad;
+            }
+        });
+}
+
 document.addEventListener("DOMContentLoaded", () => {
-            const selectOrden = document.getElementById("ordenar-select");
+    const selectOrden = document.getElementById("ordenar-select");
 
-            function cargarProductos() {
-            const params = new URLSearchParams(window.location.search);
-            const categoria = params.get("categoria");
-            const orden = params.get("orden");
+    function cargarProductos() {
+        const params = new URLSearchParams(window.location.search);
+        const categoria = params.get("categoria");
+        const orden = params.get("orden");
 
-            if (selectOrden && orden) {
-                selectOrden.value = orden;
-            }
+        if (selectOrden && orden) {
+            selectOrden.value = orden;
+        }
 
-            let url = "/api/productos/";
-            if (categoria || orden) {
-                url += "?";
-                if (categoria) url += `categoria=${categoria}&`;
-                if (orden) url += `orden=${orden}`;
-            }
+        let url = "/api/productos/";
+        if (categoria || orden) {
+            url += "?";
+            if (categoria) url += `categoria=${categoria}&`;
+            if (orden) url += `orden=${orden}`;
+        }
 
-            fetch(url)
+        fetch(url)
             .then(res => res.json())
             .then(productos => {
                 const container = document.getElementById("productos-container");
@@ -38,7 +120,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                     <p>${p.descripcion}</p>
                                     <div class="d-flex justify-content-between flex-lg-wrap">
                                         <p class="text-dark fs-5 fw-bold mb-0">$${p.precio}</p>
-                                        <a href="#" onclick="agregarAlCarrito({{ producto.id }})" class="btn border border-secondary rounded-pill px-3 text-primary">
+                                        <a href="#" class="btn border border-secondary rounded-pill px-3 text-primary agregar-carrito-btn" data-producto-id="${p.id}">
                                             <i class="fa fa-shopping-bag me-2 text-primary"></i> Añadir al carro
                                         </a>
                                     </div>
@@ -47,70 +129,36 @@ document.addEventListener("DOMContentLoaded", () => {
                         </div>`;
                     container.innerHTML += card;
                 });
+
+                // Reasignar eventos a los nuevos botones
+                document.querySelectorAll('.agregar-carrito-btn').forEach(button => {
+                    button.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const productoId = this.getAttribute('data-producto-id');
+                        agregarAlCarrito(productoId);
+                    });
+                });
             })
             .catch(err => console.error("Error cargando productos:", err));
-            }
+    }
 
-            if (selectOrden) {
-            selectOrden.addEventListener("change", () => {
-                const orden = selectOrden.value;
-                const params = new URLSearchParams(window.location.search);
+    if (selectOrden) {
+        selectOrden.addEventListener("change", () => {
+            const orden = selectOrden.value;
+            const params = new URLSearchParams(window.location.search);
 
-                if (orden) {
+            if (orden) {
                 params.set("orden", orden);
-                } else {
+            } else {
                 params.delete("orden");
-                }
-
-                const nuevaUrl = `${window.location.pathname}?${params.toString()}`;
-                window.history.replaceState({}, '', nuevaUrl);
-                cargarProductos();
-            });
             }
 
+            const nuevaUrl = `${window.location.pathname}?${params.toString()}`;
+            window.history.replaceState({}, '', nuevaUrl);
             cargarProductos();
         });
-        document.querySelectorAll('.agregar-carrito-btn').forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-            const productoId = this.getAttribute('data-producto-id');
-            agregarAlCarrito(productoId);
-        });
-        });
-        function agregarAlCarrito(productoId) {
-        fetch('/carrito/agregar/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token }}'
-            },
-            body: JSON.stringify({ producto_id: productoId }),
-            credentials: 'include'
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.error === 'No autenticado') {
-                window.location.href = '/login/';
-            } else if (data.error) {
-                alert(data.error);
-            } else {
-                alert('Producto agregado al carrito');
-                actualizarContadorCarrito();
-            }
-        })
-        .catch(err => {
-            console.error("Error:", err);
-            alert('Error al agregar producto');
-        });
     }
 
-    function actualizarContadorCarrito() {
-        fetch('/carrito/contador/')
-            .then(res => res.json())
-            .then(data => {
-                const contador = document.getElementById('carrito-contador');
-                if (contador) {
-                    contador.innerText = data.cantidad;
-                }
-            });
-    }
+    cargarProductos();
+    
+});

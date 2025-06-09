@@ -44,7 +44,7 @@ def perfil_usuario(request):
         "email": request.user.email
     })
 class ProductoAPIView(APIView):
-    permission_classes = [AllowAny]  # Puedes usar permisos más restrictivos si deseas
+    permission_classes = [AllowAny]
 
     def get(self, request):
         productos = Producto.objects.all()
@@ -73,14 +73,46 @@ class ProductoAPIView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
+class ProductoMayoristaAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        if not hasattr(request.user, 'perfilusuario') or not request.user.perfilusuario.empresa:
+            return Response({'error': 'Acceso restringido a cuentas mayoristas'}, status=403)
+
+        productos = Producto.objects.all()
+
+        data = []
+        for producto in productos:
+            data.append({
+                "id": producto.id,
+                "nombre": producto.nombre,
+                "descripcion": producto.descripcion,
+                "imagen": producto.imagen.url if producto.imagen else None,
+                "precio_mayorista": producto.precio_mayorista,
+                "stock": producto.stock,
+                "categoria": producto.categoria.nombre
+            })
+
+        return Response(data)
+def productos_mayoristas_page(request):
+    token, _ = Token.objects.get_or_create(user=request.user)
+    return render(request, 'mayorista_productos.html', {
+        'token': token.key
+    })
+    
 class HomeView(APIView):
     permission_classes = [AllowAny]
     def get(self, request):
-        template_dir = settings.TEMPLATES[0]['DIRS'][0]
-        full_path = os.path.join(template_dir, 'home.html')
-        print("Buscando template en:", full_path)
-        print("¿Existe archivo?", os.path.exists(full_path))
-        return render(request, 'home.html')
+        productos = Producto.objects.all()[:8] 
+        es_empresa = False
+        if request.user.is_authenticated and hasattr(request.user, 'perfilusuario'):
+            es_empresa = request.user.perfilusuario.empresa
+
+        return render(request, 'home.html', {
+            'productos': productos,
+            'es_empresa': es_empresa,
+        })
 def cerrar_sesion(request):
     logout(request)  # Elimina la sesión del lado del servidor
     response = JsonResponse({'mensaje': 'Sesión cerrada'})
@@ -182,10 +214,15 @@ class PerfilUsuarioView(APIView):
 
 def perfil_page(request):
     return render(request, 'perfil.html')
-
 def detalle_producto(request, producto_id):
     producto = get_object_or_404(Producto, id=producto_id)
-    return render(request, 'detalle.html', {'producto': producto})
+    es_empresa = False
+    if request.user.is_authenticated and hasattr(request.user, 'perfilusuario'):
+        es_empresa = request.user.perfilusuario.empresa
+    return render(request, "detalle.html", {
+        "producto": producto,
+        "es_empresa": es_empresa,
+    })
 
 class CarritoView(APIView):
     permission_classes = [IsAuthenticated]
@@ -198,7 +235,7 @@ class CarritoView(APIView):
                 "producto": item.producto.nombre,
                 "producto_id": item.producto.id,
                 "cantidad": item.cantidad,
-                "precio": item.producto.precio,
+                "precio": item.precio, 
             }
             for item in items
         ]
@@ -210,7 +247,7 @@ class AgregarCarritoView(APIView):
     def post(self, request):
         user = request.user
         producto_id = request.data.get('producto_id')
-        cantidad = request.data.get('cantidad', 1)
+        cantidad = int(request.data.get('cantidad', 1))
 
         if not producto_id:
             return Response({'error': 'Falta producto_id'}, status=status.HTTP_400_BAD_REQUEST)
@@ -222,13 +259,22 @@ class AgregarCarritoView(APIView):
         
         carrito, created = Carrito.objects.get_or_create(user=user, is_active=True)
 
-        carrito_item, created = CarritoItem.objects.get_or_create(carrito=carrito, producto=producto)
+        # DETERMINA EL PRECIO SEGÚN EL USUARIO
+        if hasattr(user, 'perfilusuario') and user.perfilusuario.empresa:
+            precio = producto.precio_mayorista
+        else:
+            precio = producto.precio
+
+        carrito_item, created = CarritoItem.objects.get_or_create(
+            carrito=carrito, producto=producto,
+            defaults={'cantidad': cantidad, 'precio': precio}
+        )
         if not created:
-            carrito_item.cantidad += int(cantidad)
+            carrito_item.cantidad += cantidad
+            carrito_item.precio = precio 
             carrito_item.save()
         
         return Response({'message': 'Producto agregado al carrito'}, status=status.HTTP_200_OK)
-    
 class RemoverDelCarritoView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -588,19 +634,26 @@ def pagar_view(request, order_id):
         return redirect("/carrito/")
     
 def pago_exitoso(request):
-    token_ws = request.GET.get('token_ws')  
-    transaction = Transaction(options) 
-    result = transaction.commit(token_ws)  
+    token_ws = request.GET.get('token_ws')
+    tbk_token = request.GET.get('TBK_TOKEN')
+
+    if not token_ws:
+        # El usuario anuló o rechazó el pago
+        from django.contrib import messages
+        messages.error(request, "El pago fue anulado o rechazado. Puedes intentar nuevamente.")
+        return redirect("/carrito/")
+
+    transaction = Transaction(options)
+    result = transaction.commit(token_ws)
 
     if result['status'] == 'AUTHORIZED':
-        # Leer los datos desde la sesión
+        # ...tu lógica de éxito...
         cart = request.session.get("cart", [])
         email = request.session.get("email", "")
         monto = request.session.get("monto", "")
         metodo = request.session.get("metodo_pago", "")
         order_id = request.session.get("order_id", "")
 
-        # Convertimos el carrito para usarlo en la plantilla
         productos = []
         for item in cart:
             productos.append({
@@ -617,6 +670,7 @@ def pago_exitoso(request):
             "metodo": metodo,
             "productos": productos
         })
-
     else:
-        return render(request, "carrito.html")
+        from django.contrib import messages
+        messages.error(request, "El pago fue rechazado o anulado. Puedes intentar nuevamente.")
+        return redirect("/carrito/")
