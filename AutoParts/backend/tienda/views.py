@@ -240,6 +240,7 @@ class CarritoView(APIView):
             for item in items
         ]
         return Response({"carrito": data})
+
     
 class AgregarCarritoView(APIView):
     permission_classes = [IsAuthenticated]

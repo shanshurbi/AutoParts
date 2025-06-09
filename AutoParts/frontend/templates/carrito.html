@@ -42,6 +42,7 @@
                   <th>Precio</th>
                   <th>Cantidad</th>
                   <th>Subtotal</th>
+                  <th>Acciones</th>
                 </tr>
               </thead>
               <tbody id="carrito-body">
@@ -57,7 +58,11 @@
               <option value="tarjeta">Tarjeta (Webpay)</option>
               <option value="transferencia" disabled>Transferencia (próximamente)</option>
             </select>
-
+<div id="resumen-carrito" class="mt-4 text-end" style="display: none;">
+  <p><strong>Subtotal:</strong> <span id="subtotal">-</span></p>
+  <p><strong>IVA (19%):</strong> <span id="iva">-</span></p>
+  <p><strong>Total:</strong> <span id="total">-</span></p>
+</div>
             <div class="d-flex justify-content-end align-items-center">
               <button id="btnConfirmarPago" class="btn">Ir a pagar</button>
             </div>
@@ -65,9 +70,195 @@
         </div>
       </div>
     </main>
+<script>
+async function asegurarToken() {
+  let token = localStorage.getItem("token");
+  if (!token || token === "undefined" || token === "null" || token.trim() === "") {
+    try {
+      const response = await fetch("/api/login/from-session/", {
+        method: "GET",
+        credentials: "include"
+      });
+      if (response.ok) {
+        const data = await response.json();
+        token = data.token;
+        localStorage.setItem("token", token);
+      } else {
+        localStorage.removeItem("token");
+        window.location.href = "/login/";
+        return null;
+      }
+    } catch (error) {
+      localStorage.removeItem("token");
+      window.location.href = "/login/";
+      return null;
+    }
+  }
+  return token;
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+  const token = await asegurarToken();
+  if (!token) return;
+
+  const cargarCarrito = async () => {
+    try {
+      const res = await fetch("/api/carrito/", {
+        headers: { "Authorization": "Token " + token }
+      });
+
+      if (!res.ok) throw new Error("Error al obtener el carrito");
+
+      const data = await res.json();
+      const carrito = data.carrito;
+      const tbody = document.getElementById("carrito-body");
+      const mensajeVacio = document.getElementById("mensaje-vacio");
+      const resumen = document.getElementById("resumen-carrito");
+      const subtotalElem = document.getElementById("subtotal");
+      const ivaElem = document.getElementById("iva");
+      const totalElem = document.getElementById("total");
+
+      tbody.innerHTML = "";
+      let subtotal = 0;
+
+      if (carrito.length === 0) {
+        mensajeVacio.style.display = "block";
+        resumen.style.display = "none";
+        return;
+      }
+
+      mensajeVacio.style.display = "none";
+
+      carrito.forEach(item => {
+        const fila = document.createElement("tr");
+        const itemSubtotal = item.precio * item.cantidad;
+        subtotal += itemSubtotal;
+
+        fila.innerHTML = `
+          <td>${item.producto}</td>
+          <td>$${item.precio.toLocaleString("es-CL")}</td>
+          <td>
+            <div class="d-flex align-items-center gap-2">
+              <button class="btn btn-sm btn-outline-secondary" onclick="cambiarCantidad(${item.producto_id}, 'disminuir')">-</button>
+              <span>${item.cantidad}</span>
+              <button class="btn btn-sm btn-outline-secondary" onclick="cambiarCantidad(${item.producto_id}, 'aumentar')">+</button>
+            </div>
+          </td>
+          <td>$${itemSubtotal.toLocaleString("es-CL")}</td>
+          <td>
+            <button class="btn btn-sm btn-danger" onclick="eliminarProducto(${item.producto_id})">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          </td>
+        `;
+        tbody.appendChild(fila);
+      });
+
+      // Calcular IVA y total
+      const iva = subtotal * 0.19;
+      const total = subtotal + iva;
+
+      subtotalElem.textContent = subtotal.toLocaleString("es-CL", { style: "currency", currency: "CLP" });
+      ivaElem.textContent = iva.toLocaleString("es-CL", { style: "currency", currency: "CLP" });
+      totalElem.textContent = total.toLocaleString("es-CL", { style: "currency", currency: "CLP" });
+      resumen.style.display = "block";
+
+    } catch (err) {
+      console.error("❌ Error cargando carrito:", err);
+    }
+  };
+
+  // Funciones para cambiar cantidad o eliminar
+  window.cambiarCantidad = async (productoId, accion) => {
+    const endpoint = accion === 'aumentar'
+      ? `/api/carrito/aumentar/${productoId}/`
+      : `/api/carrito/disminuir/${productoId}/`;
+
+    try {
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Authorization": "Token " + token }
+      });
+      if (res.ok) {
+        cargarCarrito();
+      }
+    } catch (err) {
+      console.error(`Error al ${accion} producto:`, err);
+    }
+  };
+
+  window.eliminarProducto = async (productoId) => {
+    if (!confirm("¿Deseas eliminar este producto del carrito?")) return;
+
+    try {
+      const res = await fetch(`/api/carrito/remover/${productoId}/`, {
+        method: "POST",
+        headers: { "Authorization": "Token " + token }
+      });
+      if (res.ok) {
+        cargarCarrito();
+      }
+    } catch (err) {
+      console.error("Error al eliminar producto:", err);
+    }
+  };
+
+  // Inicializar
+  cargarCarrito();
+});
+document.getElementById("btnConfirmarPago").addEventListener("click", async () => {
+  const token = localStorage.getItem("token");
+  const email = document.getElementById("userEmail")?.value || "";
+  const metodo = document.getElementById("metodoPago")?.value || "";
+  const totalTexto = document.getElementById("total")?.textContent || "0";
+
+  if (!metodo) {
+    alert("Selecciona un método de pago.");
+    return;
+  }
+
+  const monto = Number(totalTexto.replace(/[^0-9]/g, ''));
+  if (!monto || isNaN(monto)) {
+    alert("Total inválido.");
+    return;
+  }
+
+  try {
+    const res = await fetch("/crear_pedido/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Token " + token
+      },
+      body: JSON.stringify({
+        email: email,
+        metodo_pago: metodo,
+        monto: monto
+      })
+    });
+
+    if (!res.ok) {
+      alert("Error al crear el pedido.");
+      return;
+    }
+
+    const data = await res.json();
+    const order_id = data.order_id;
+
+    if (order_id) {
+      window.location.href = `/pagar/${order_id}/`;
+    } else {
+      alert("No se pudo generar la orden.");
+    }
+  } catch (err) {
+    console.error("Error al confirmar pago:", err);
+    alert("Hubo un error al iniciar el pago.");
+  }
+});
+</script>
 
     {% include "base/footer.html" %}
-    <script src="{% static 'js/carrito.js' %}"></script>
+   
 
 </body>
 </html>
