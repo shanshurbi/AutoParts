@@ -1368,3 +1368,14 @@ main {
   background-color: #C1121F;
   color: white;
 }
+
+  .btn-rojo {
+    background-color: #C1121F;
+    color: #FDF0D5;
+    border: none;
+  }
+
+  .btn-rojo:hover {
+    background-color: #780000;
+    color: #fff;
+  }

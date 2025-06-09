@@ -146,9 +146,9 @@ document.addEventListener("DOMContentLoaded", async () => {
           </td>
           <td>$${itemSubtotal.toLocaleString("es-CL")}</td>
           <td>
-            <button class="btn btn-sm btn-danger" onclick="eliminarProducto(${item.producto_id})">
-              <i class="fas fa-trash-alt"></i>
-            </button>
+        <button class="btn btn-sm btn-rojo" onclick="eliminarProducto(${item.producto_id})">
+          <i class="fas fa-trash-alt"></i>
+        </button>
           </td>
         `;
         tbody.appendChild(fila);
