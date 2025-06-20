@@ -170,21 +170,30 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Funciones para cambiar cantidad o eliminar
   window.cambiarCantidad = async (productoId, accion) => {
-    const endpoint = accion === 'aumentar'
-      ? `/api/carrito/aumentar/${productoId}/`
-      : `/api/carrito/disminuir/${productoId}/`;
+  const endpoint = accion === 'aumentar'
+    ? `/api/carrito/aumentar/${productoId}/`
+    : `/api/carrito/disminuir/${productoId}/`;
 
-    try {
-      const res = await fetch(endpoint, {
-        method: "POST",
-        headers: { "Authorization": "Token " + token }
+  try {
+    const res = await fetch(endpoint, {
+      method: "POST",
+      headers: { "Authorization": "Token " + token }
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      cargarCarrito();
+    } else {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Stock insuficiente',
+        text: data.error || 'No se pudo actualizar la cantidad.'
       });
-      if (res.ok) {
-        cargarCarrito();
-      }
-    } catch (err) {
-      console.error(`Error al ${accion} producto:`, err);
     }
+  } catch (err) {
+    console.error(`Error al ${accion} producto:`, err);
+  }
   };
 
   window.eliminarProducto = async (productoId) => {

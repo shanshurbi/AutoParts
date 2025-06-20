@@ -511,14 +511,20 @@ def aumentar_producto(request, producto_id):
         defaults={'cantidad': 1}
     )
 
+    producto = item.producto  # Accede al producto desde el item
+
     if not created:
-        item.cantidad += 1
-        item.save()
-        print(f"🟢 Cantidad actualizada: {item.cantidad}")
+        if item.cantidad < producto.stock:
+            item.cantidad += 1
+            item.save()
+            print(f"🟢 Cantidad actualizada: {item.cantidad}")
+            return Response({"detalle": "Cantidad aumentada"})
+        else:
+            print("❌ No se puede aumentar: stock máximo alcanzado")
+            return Response({"error": "No hay suficiente stock disponible"}, status=400)
     else:
         print("🆕 Producto agregado al carrito")
-
-    return Response({"detalle": "Cantidad aumentada"})
+        return Response({"detalle": "Producto agregado"})
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
