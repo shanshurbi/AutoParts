@@ -39,34 +39,30 @@ async function asegurarToken() {
     return token;
 }
 
-async function agregarAlCarrito(productoId) {
-    const token = await asegurarToken();
-    if (!token) return;
-    fetch('/carrito/agregar/', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': getCookie('csrftoken'),
-            'Authorization': 'Token ' + token
-        },
-        body: JSON.stringify({ producto_id: productoId }),
-        credentials: 'include'
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.error === 'No autenticado') {
-            window.location.href = '/login/';
-        } else if (data.error) {
-            alert(data.error);
-        } else {
-            alert('Producto agregado al carrito');
-            actualizarContadorCarrito();
-        }
-    })
-    .catch(err => {
-        console.error("Error:", err);
-        alert('Error al agregar producto');
-    });
+function agregarAlCarrito(productoId) {
+  fetch('/carrito/agregar/', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Token ' + localStorage.getItem('token')
+    },
+    body: JSON.stringify({ producto_id: productoId })
+  })
+  .then(response => response.json().then(data => ({ status: response.status, data })))
+  .then(({ status, data }) => {
+    if (data.error === 'No autenticado') {
+      window.location.href = '/login/';
+    } else if (status >= 400) {
+      alert(data.error || 'No se pudo agregar el producto');
+    } else {
+      alert(data.message || 'Producto agregado al carrito');
+      actualizarContadorCarrito();
+    }
+  })
+  .catch(err => {
+    console.error("Error:", err);
+    alert('Ocurrió un problema al agregar el producto.');
+  });
 }
 
 function actualizarContadorCarrito() {

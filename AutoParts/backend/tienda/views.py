@@ -257,10 +257,13 @@ class AgregarCarritoView(APIView):
             producto = Producto.objects.get(id=producto_id)
         except Producto.DoesNotExist:
             return Response({'error': 'Producto no encontrado'}, status=status.HTTP_404_NOT_FOUND)
-        
-        carrito, created = Carrito.objects.get_or_create(user=user, is_active=True)
 
-        # DETERMINA EL PRECIO SEGÚN EL USUARIO
+        if producto.stock < cantidad:
+            return Response({'error': 'No hay suficiente stock disponible'}, status=status.HTTP_400_BAD_REQUEST)
+
+        carrito, _ = Carrito.objects.get_or_create(user=user, is_active=True)
+
+        # Precio según tipo de usuario
         if hasattr(user, 'perfilusuario') and user.perfilusuario.empresa:
             precio = producto.precio_mayorista
         else:
@@ -270,11 +273,15 @@ class AgregarCarritoView(APIView):
             carrito=carrito, producto=producto,
             defaults={'cantidad': cantidad, 'precio': precio}
         )
+
         if not created:
-            carrito_item.cantidad += cantidad
-            carrito_item.precio = precio 
+            nueva_cantidad = carrito_item.cantidad + cantidad
+            if nueva_cantidad > producto.stock:
+                return Response({'error': 'Stock máximo alcanzado'}, status=status.HTTP_400_BAD_REQUEST)
+            carrito_item.cantidad = nueva_cantidad
+            carrito_item.precio = precio
             carrito_item.save()
-        
+
         return Response({'message': 'Producto agregado al carrito'}, status=status.HTTP_200_OK)
 class RemoverDelCarritoView(APIView):
     permission_classes = [IsAuthenticated]

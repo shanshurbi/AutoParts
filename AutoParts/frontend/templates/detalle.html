@@ -29,7 +29,7 @@
             </div>
 
             <!-- Información del producto -->
-            <div <div class="col-md-6 d-flex flex-column justify-content-center" style="margin-top: 40px;">
+            <div class="col-md-6 d-flex flex-column justify-content-center" style="margin-top: 40px;">
                 <h2 class="fw-bold">{{ producto.nombre }}</h2>
                 <p class="text-muted">Categoría: {{ producto.categoria.nombre }}</p>
                 <h4 class="fw-semibold mb-3">
@@ -45,6 +45,9 @@
                 <p>{{ producto.descripcion }}</p>
 
             </div>
+            <button onclick="agregarAlCarrito({{ producto.id }})" class="btn border border-secondary rounded-pill px-3 text-primary">
+            <i class="fa fa-shopping-bag me-2 text-primary"></i> Añadir al carro
+            </button>
         </div>
 
         <!-- Comentarios -->
