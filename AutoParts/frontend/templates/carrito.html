@@ -27,6 +27,8 @@
         <!-- Template Stylesheet -->
         <link href="{% static 'css/style.css' %}" rel="stylesheet">
 
+        <!-- Select2 CSS -->
+        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
         {% include "base/header.html" %}
 </head>
 <body>
@@ -52,16 +54,47 @@
 
             <!-- Campo oculto con email -->
             <input type="hidden" id="userEmail" value="{{ request.user.email }}">
-
+            
             <select id="metodoPago" class="form-select mb-3">
               <option value="">Selecciona un método</option>
               <option value="tarjeta">Tarjeta (Webpay)</option>
-              <option value="transferencia" disabled>Transferencia (próximamente)</option>
+              <option value="transferencia">Transferencia </option>
             </select>
+            <div class="mb-3">
+              <label class="form-label">¿Cómo deseas recibir tu pedido?</label><br>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="metodo_entrega" id="retiro" value="retiro">
+                <label class="form-check-label" for="retiro">Retiro en tienda</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="metodo_entrega" id="envio" value="envio">
+                <label class="form-check-label" for="envio">Envío a domicilio</label>
+              </div>
+            </div>
+<div id="form-envio" style="display: none;">
+<h5>Datos para envío</h5>
+<input name="direccion" class="form-control mb-2" placeholder="Dirección de entrega" required>
+<select id="region" name="region" class="form-control mb-2" required>
+  <option value="">Selecciona región</option>
+</select>
+<select id="comuna" name="comuna" class="form-control mb-2" required>
+  <option value="">Selecciona comuna</option>
+</select>
+<input name="telefono" class="form-control mb-2" placeholder="Teléfono de contacto" required>
+</div>
 <div id="resumen-carrito" class="mt-4 text-end" style="display: none;">
   <p><strong>Subtotal:</strong> <span id="subtotal">-</span></p>
   <p><strong>IVA (19%):</strong> <span id="iva">-</span></p>
   <p><strong>Total:</strong> <span id="total">-</span></p>
+</div>
+<div id="datos-transferencia" style="display: none; margin-top: 15px;">
+  <h5>Datos para Transferencia</h5>
+  <p><strong>Banco:</strong> Banco de Chile</p>
+  <p><strong>Cuenta:</strong> 123456789</p>
+  <p><strong>Tipo de cuenta:</strong> Corriente</p>
+  <p><strong>Nombre titular:</strong> Autoparts SPA</p>
+  <p><strong>RUT:</strong> 76.543.210-1</p>
+  <p><strong>Correo:</strong> ventas@autoparts.cl</p>
 </div>
             <div class="d-flex justify-content-end align-items-center">
               <button id="btnConfirmarPago" class="btn">Ir a pagar</button>
@@ -70,6 +103,7 @@
         </div>
       </div>
     </main>
+    
 <script>
 async function asegurarToken() {
   let token = localStorage.getItem("token");
@@ -264,6 +298,61 @@ document.getElementById("btnConfirmarPago").addEventListener("click", async () =
     alert("Hubo un error al iniciar el pago.");
   }
 });
+document.getElementById("metodoPago").addEventListener("change", function () {
+  const metodo = this.value;
+  const transferenciaBox = document.getElementById("datos-transferencia");
+
+  if (metodo === "transferencia") {
+    transferenciaBox.style.display = "block";
+  } else {
+    transferenciaBox.style.display = "none";
+  }
+});
+document.addEventListener("DOMContentLoaded", function () {
+  const envioForm = document.getElementById("form-envio");
+  const radios = document.getElementsByName("metodo_entrega");
+
+  radios.forEach(radio => {
+    radio.addEventListener("change", function () {
+      if (this.value === "envio") {
+        envioForm.style.display = "block";
+      } else {
+        envioForm.style.display = "none";
+      }
+    });
+  });
+});
+const regionesYcomunas = {
+    "Región Metropolitana": ["Santiago", "Maipú", "Puente Alto", "Ñuñoa"],
+    "Valparaíso": ["Valparaíso", "Viña del Mar", "Quilpué", "Limache"],
+    "Biobío": ["Concepción", "Talcahuano", "Los Ángeles"],
+    // Agrega más regiones y comunas aquí
+  };
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const regionSelect = document.getElementById("region");
+    const comunaSelect = document.getElementById("comuna");
+
+    // Llena las regiones
+    for (let region in regionesYcomunas) {
+      const option = document.createElement("option");
+      option.value = region;
+      option.textContent = region;
+      regionSelect.appendChild(option);
+    }
+
+    // Cuando cambia la región, actualiza comunas
+    regionSelect.addEventListener("change", function () {
+      const comunas = regionesYcomunas[this.value] || [];
+      comunaSelect.innerHTML = '<option value="">Selecciona una comuna</option>';
+      comunas.forEach(comuna => {
+        const option = document.createElement("option");
+        option.value = comuna;
+        option.textContent = comuna;
+        comunaSelect.appendChild(option);
+      });
+    });
+  });
 </script>
 
     {% include "base/footer.html" %}

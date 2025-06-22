@@ -631,42 +631,50 @@ def crear_pedido(request):
     email = data.get("email")
     monto = data.get("monto")
     metodo = data.get("metodo_pago")
+    tipo_entrega = data.get("tipo_entrega")  # "retiro" o "envio"
 
-    if not email or not monto or not metodo:
-        return Response({"error": "Faltan datos para crear el pedido"}, status=400)
+    if not email or not monto or not metodo or not tipo_entrega:
+        return Response({"error": "Faltan datos requeridos"}, status=400)
 
-    # Generar order_id válido para Transbank
+    # Validación para tipo_entrega
+    if tipo_entrega not in ["retiro", "envio"]:
+        return Response({"error": "Método de entrega inválido"}, status=400)
+
+    # Generar ID único para Transbank
     order_id = generar_order_id()
 
-    # Crear y guardar el pedido en la base de datos
+    # Crear el pedido
     pedido = Pedido.objects.create(
         order_id=order_id,
         email=email,
         monto=monto,
-        estado="pendiente"
+        estado="pendiente",
+        retiro_en_tienda=(tipo_entrega == "retiro"),
+        envio_domicilio=(tipo_entrega == "envio"),
     )
 
-    # Guardar información mínima en sesión para usar en el redireccionamiento
+    # Si es envío, guardar datos adicionales
+    if tipo_entrega == "envio":
+        pedido.direccion = data.get("direccion")
+        pedido.comuna = data.get("comuna")
+        pedido.region = data.get("region")
+        telefono = getattr(user.perfilusuario, "telefono", "")
+
+        # Validar que estén todos los campos
+        if not all([pedido.direccion, pedido.comuna, pedido.region, pedido.telefono]):
+            return Response({"error": "Faltan datos de envío"}, status=400)
+
+        pedido.save()
+    else:
+        pedido.save()
+
+    # Guardar en sesión
     request.session["order_id"] = order_id
     request.session["email"] = email
     request.session["monto"] = monto
     request.session["metodo_pago"] = metodo
     request.session["user_id"] = user.id
-
-    # Obtener carrito actual del usuario
-    carrito = Carrito.objects.filter(user=user, is_active=True).first()
-    if carrito:
-        items = CarritoItem.objects.filter(carrito=carrito)
-        cart = [
-            {
-                "producto": item.producto.nombre,
-                "producto_id": item.producto.id,  # 👈 NECESARIO para descontar stock luego
-                "precio": item.precio,
-                "cantidad": item.cantidad,
-            }
-            for item in items
-        ]
-        request.session["cart"] = cart
+    request.session["tipo_entrega"] = tipo_entrega
 
     return Response({"order_id": order_id})
 @login_required

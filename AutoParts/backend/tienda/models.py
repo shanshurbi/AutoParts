@@ -73,6 +73,7 @@ class PerfilUsuario(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     trabajador = models.BooleanField(default=False)
     empresa = models.BooleanField(db_default=False)
+    telefono = models.CharField(max_length=20, blank=True, null=True)
 
     def __str__(self):
         return self.user.username
@@ -84,6 +85,11 @@ class Pedido(models.Model):
     monto = models.PositiveIntegerField()
     estado = models.CharField(max_length=20, default="pendiente")  # puede ser: pendiente, pagado, fallido, etc.
     fecha = models.DateTimeField(auto_now_add=True)
+    retiro_en_tienda = models.BooleanField( default=False)
+    envio_domicilio = models.BooleanField( default=False )
+    direccion = models.CharField(max_length=225, blank=True, null=True)
+    comuna = models.CharField(max_length=100, blank=True, null=True)
+    region = models.CharField(max_length=100, blank=True, null=True)
 
     def __str__(self):
         return f"Pedido {self.order_id} - {self.email} - {self.estado}"

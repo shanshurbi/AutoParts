@@ -35,19 +35,24 @@
     <div class="navbar-nav mx-auto">
         <a href="{% url 'home' %}" class="nav-item nav-link {% if request.path == '/' %}active{% endif %}">Inicio</a>
         <a href="{% url 'catalogo' %}" class="nav-item nav-link">Catálogo</a>
-        {% if request.user.is_authenticated and request.user.is_staff %}
-        <a href="{% url 'gestion_productos' %}" class="nav-item nav-link">
-            Inventario
-        </a>
-        <a href="{% url 'gestion_categorias' %}" class="nav-item nav-link">
-            Categorias
-        </a>
-        {% endif %}
-        {% if request.user.is_authenticated and request.user.is_staff %}
-        <a href="{% url 'gestion_trabajadores' %}" class="nav-item nav-link">
-            Personas
-        </a>
-        {% endif %}
+        <div class="nav-item dropdown">
+        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Administración</a>
+            <div class="dropdown-menu m-0 bg-dark rounded-0">
+            {% if request.user.is_authenticated and request.user.is_staff %}
+            <a href="{% url 'gestion_productos' %}" class="nav-item nav-link">
+                Inventario
+            </a>
+            <a href="{% url 'gestion_categorias' %}" class="nav-item nav-link">
+                Categorias
+            </a>
+            {% endif %}
+            {% if request.user.is_authenticated and request.user.is_staff %}
+            <a href="{% url 'gestion_trabajadores' %}" class="nav-item nav-link">
+                Personas
+            </a>
+            {% endif %}
+            </div>
+        </div>
         <div class="nav-item dropdown">
             <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Cuenta</a>
             <div class="dropdown-menu m-0 bg-dark rounded-0">
