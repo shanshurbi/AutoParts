@@ -612,6 +612,21 @@ def crear_pedido(request):
     request.session["metodo_pago"] = metodo
     request.session["user_id"] = user.id
 
+    # Obtener carrito actual del usuario
+    carrito = Carrito.objects.filter(user=user, is_active=True).first()
+    if carrito:
+        items = CarritoItem.objects.filter(carrito=carrito)
+        cart = [
+            {
+                "producto": item.producto.nombre,
+                "producto_id": item.producto.id,  # 👈 NECESARIO para descontar stock luego
+                "precio": item.precio,
+                "cantidad": item.cantidad,
+            }
+            for item in items
+        ]
+        request.session["cart"] = cart
+
     return Response({"order_id": order_id})
 @login_required
 def pagar_view(request, order_id):
