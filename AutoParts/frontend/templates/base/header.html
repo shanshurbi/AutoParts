@@ -39,6 +39,9 @@
         <a href="{% url 'gestion_productos' %}" class="nav-item nav-link">
             Inventario
         </a>
+        <a href="{% url 'gestion_categorias' %}" class="nav-item nav-link">
+            Categorias
+        </a>
         {% endif %}
         {% if request.user.is_authenticated and request.user.is_staff %}
         <a href="{% url 'gestion_trabajadores' %}" class="nav-item nav-link">

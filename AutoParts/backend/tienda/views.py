@@ -21,7 +21,7 @@ from django.views.decorators.csrf import csrf_exempt
 from transbank.webpay.webpay_plus.transaction import Transaction,WebpayOptions
 from transbank.common.integration_type import IntegrationType
 from .models import Pedido, Producto, Vehiculo, Categoria, Carrito, CarritoItem, PerfilUsuario
-from .serializers import ProductoSerializer, VehiculoSerializer
+from .serializers import ProductoSerializer, VehiculoSerializer, CategoriaSerializer
 from django.contrib.auth import logout
 import re, os
 import random
@@ -437,6 +437,21 @@ class ProductoCrudView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class CategoriasCrudView(APIView):
+    permission_classes = [permissions.IsAuthenticated, EsTrabajador]
+
+    def get(self, request):
+        categorias = Categoria.objects.all()
+        serializer = CategoriaSerializer(categorias, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        serializer = CategoriaSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
+
 class ProductoDetalleAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated, EsTrabajador]
 
@@ -473,11 +488,37 @@ class ProductoDetalleAPIView(APIView):
         producto.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
     
-    
+class CategoriaDetalleAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated, EsTrabajador]
+
+    def get_object(self, pk):
+        return get_object_or_404(Categoria, pk=pk)
+
+    def get(self, request, pk):
+        categoria = self.get_object(pk)
+        serializer = CategoriaSerializer(categoria)
+        return Response(serializer.data)
+
+    def put(self, request, pk):
+        categoria = self.get_object(pk)
+        serializer = CategoriaSerializer(categoria, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=400)
+
+    def delete(self, request, pk):
+        categoria = self.get_object(pk)
+        categoria.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)  
     
 def gestion_prod_page(request):
     categorias = Categoria.objects.all()
     return render(request, 'gestion_productos.html', {'categorias': categorias})
+
+def gestion_cat_page(request):
+    categorias = Categoria.objects.all()
+    return render(request, 'gestion_categorias.html')
 
 class TokenDesdeSesionView(APIView):
     permission_classes = [IsAuthenticated]
