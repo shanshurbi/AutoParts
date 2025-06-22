@@ -667,30 +667,63 @@ def pago_exitoso(request):
     tbk_token = request.GET.get('TBK_TOKEN')
 
     if not token_ws:
-        # El usuario anuló o rechazó el pago
-        from django.contrib import messages
         messages.error(request, "El pago fue anulado o rechazado. Puedes intentar nuevamente.")
         return redirect("/carrito/")
 
-    transaction = Transaction(options)
+    transaction = Transaction(options)  # Asegúrate de que 'options' esté definido globalmente o importado
     result = transaction.commit(token_ws)
 
     if result['status'] == 'AUTHORIZED':
-        # ...tu lógica de éxito...
         cart = request.session.get("cart", [])
         email = request.session.get("email", "")
         monto = request.session.get("monto", "")
         metodo = request.session.get("metodo_pago", "")
         order_id = request.session.get("order_id", "")
 
+        # Crear pedido si no existe (evita error de duplicado)
+        pedido, creado = Pedido.objects.get_or_create(
+            order_id=order_id,
+            defaults={
+                'email': email,
+                'monto': monto,
+                'estado': 'pagado'
+            }
+        )
+
         productos = []
+
         for item in cart:
+            producto_id = item.get("producto_id")
+            cantidad = item.get("cantidad", 1)
+
+            try:
+                producto = Producto.objects.get(id=producto_id)
+                if producto.stock >= cantidad:
+                    producto.stock -= cantidad
+                    producto.save()
+                else:
+                    messages.warning(request, f"No hay suficiente stock para {producto.nombre}")
+            except Producto.DoesNotExist:
+                messages.warning(request, f"Producto con ID {producto_id} no encontrado")
+
             productos.append({
                 "producto": item.get("producto", "Producto desconocido"),
                 "precio": item.get("precio", 0),
-                "cantidad": item.get("cantidad", 1),
-                "subtotal": item.get("precio", 0) * item.get("cantidad", 1)
+                "cantidad": cantidad,
+                "subtotal": item.get("precio", 0) * cantidad
             })
+
+        # Limpiar carrito de sesión
+        request.session["cart"] = []
+
+        # Eliminar ítems del carrito en base de datos y marcarlo como inactivo
+        from .models import Carrito, CarritoItem
+
+        carrito = Carrito.objects.filter(user=request.user, is_active=True).first()
+        if carrito:
+            CarritoItem.objects.filter(carrito=carrito).delete()
+            carrito.is_active = False
+            carrito.save()
 
         return render(request, "pago_exitoso.html", {
             "email": email,
@@ -699,7 +732,7 @@ def pago_exitoso(request):
             "metodo": metodo,
             "productos": productos
         })
+
     else:
-        from django.contrib import messages
         messages.error(request, "El pago fue rechazado o anulado. Puedes intentar nuevamente.")
         return redirect("/carrito/")
