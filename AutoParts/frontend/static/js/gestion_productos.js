@@ -42,6 +42,8 @@ function cargarProductos() {
             <td>${formatearCLP(p.precio)}</td>
             <td>${formatearCLP(p.precio_mayorista)}</td>
             <td>${p.stock}</td>
+            <td>${p.peso} kg</td>
+            <td>${p.largo} × ${p.ancho} × ${p.alto} cm</td>
             <td><img src="${p.imagen || ''}" alt="${p.nombre}" style="max-height: 50px;"></td>
             <td>
               <button class="btn-editar me-1" onclick="mostrarFormularioModificar(${p.id})">Modificar</button>
@@ -72,6 +74,10 @@ function mostrarFormularioModificar(id) {
       form.descripcion.value = p.descripcion;
       form.stock.value = p.stock;
       form.categoria.value = p.categoria; 
+      form.peso.value = p.peso;
+      form.largo.value = p.largo;
+      form.ancho.value = p.ancho;
+      form.alto.value = p.alto;
     })
     .catch(console.error);
 }

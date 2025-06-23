@@ -33,6 +33,10 @@ class Producto(models.Model):
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     marca = models.ManyToManyField(Marca, related_name='productos')
     categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE, related_name='productos')
+    peso = models.DecimalField( max_digits=5, decimal_places=2)
+    largo = models.PositiveIntegerField()
+    ancho = models.PositiveIntegerField()
+    alto = models.PositiveIntegerField()
     
 
     def __str__(self):
