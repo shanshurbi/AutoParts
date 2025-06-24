@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from .views import ProductoAPIView, HomeView, LoginView, ProductoMayoristaAPIView, cerrar_sesion, login_page, catalogo_view, RegistroView, registro_page, PerfilUsuarioView, perfil_page, detalle_producto, CarritoView, AgregarCarritoView, RemoverDelCarritoView, carrito_page, CarritoContadorView, TrabajadoresAdminView, gestion_page, TrabajadorUpdateView, ProductoDetalleAPIView, gestion_prod_page, CategoriaDetalleAPIView, CategoriasCrudView, gestion_cat_page
+from .views import ProductoAPIView, HomeView, LoginView, ProductoMayoristaAPIView, cerrar_sesion, login_page, catalogo_view, RegistroView, registro_page, PerfilUsuarioView, perfil_page, detalle_producto, CarritoView, AgregarCarritoView, RemoverDelCarritoView, carrito_page, CarritoContadorView, TrabajadoresAdminView, gestion_page, TrabajadorUpdateView, ProductoDetalleAPIView, gestion_prod_page, CategoriaDetalleAPIView, CategoriasCrudView, gestion_cat_page, crear_envio
 from tienda.views import TokenDesdeSesionView
 
 urlpatterns=[
@@ -38,4 +38,5 @@ urlpatterns=[
     path('api/categorias/', CategoriasCrudView.as_view(), name='lista_categorias'),
     path('api/categorias/<int:pk>/', CategoriaDetalleAPIView.as_view(), name='detalle_categoria'),
     path('gestion_categorias', gestion_cat_page, name='gestion_categorias'),
+    path('api/crear-envio/', crear_envio, name='crear-envio'),
 ]

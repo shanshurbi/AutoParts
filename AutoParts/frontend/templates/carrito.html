@@ -63,17 +63,17 @@
             <div class="mb-3">
               <label class="form-label">¿Cómo deseas recibir tu pedido?</label><br>
               <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="metodo_entrega" id="retiro" value="retiro">
+                <input class="form-check-input" type="radio" name="tipo_entrega" id="retiro" value="retiro">
                 <label class="form-check-label" for="retiro">Retiro en tienda</label>
               </div>
               <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="metodo_entrega" id="envio" value="envio">
+                <input class="form-check-input" type="radio" name="tipo_entrega" id="envio" value="envio">
                 <label class="form-check-label" for="envio">Envío a domicilio</label>
               </div>
             </div>
 <div id="form-envio" style="display: none;">
 <h5>Datos para envío</h5>
-<input name="direccion" class="form-control mb-2" placeholder="Dirección de entrega" required>
+<input id="direccion" name="direccion" class="form-control mb-2" placeholder="Dirección de entrega" required>
 <select id="region" name="region" class="form-control mb-2" required>
   <option value="">Selecciona región</option>
 </select>
@@ -254,6 +254,7 @@ document.getElementById("btnConfirmarPago").addEventListener("click", async () =
   const email = document.getElementById("userEmail")?.value || "";
   const metodo = document.getElementById("metodoPago")?.value || "";
   const totalTexto = document.getElementById("total")?.textContent || "0";
+  const tipoEntrega = document.querySelector('input[name="tipo_entrega"]:checked')?.value;
 
   if (!metodo) {
     alert("Selecciona un método de pago.");
@@ -266,6 +267,30 @@ document.getElementById("btnConfirmarPago").addEventListener("click", async () =
     return;
   }
 
+  if (!tipoEntrega) {
+    alert("Selecciona una opción de entrega (retiro o envío).");
+    return;
+  }
+
+  // Prepara el objeto de datos
+  const datos = {
+    email: email,
+    metodo_pago: metodo,
+    monto: monto,
+    tipo_entrega: tipoEntrega
+  };
+
+  if (tipoEntrega === "envio") {
+    datos.direccion = document.getElementById("direccion")?.value || "";
+    datos.comuna = document.getElementById("comuna")?.value || "";
+    datos.region = document.getElementById("region")?.value || "";
+
+    if (!datos.direccion || !datos.comuna || !datos.region) {
+      alert("Completa todos los campos de dirección para el envío.");
+      return;
+    }
+  }
+
   try {
     const res = await fetch("/crear_pedido/", {
       method: "POST",
@@ -273,15 +298,12 @@ document.getElementById("btnConfirmarPago").addEventListener("click", async () =
         "Content-Type": "application/json",
         "Authorization": "Token " + token
       },
-      body: JSON.stringify({
-        email: email,
-        metodo_pago: metodo,
-        monto: monto
-      })
+      body: JSON.stringify(datos)
     });
 
     if (!res.ok) {
-      alert("Error al crear el pedido.");
+      const errData = await res.json();
+      alert("Error al crear el pedido: " + (errData.error || "Desconocido"));
       return;
     }
 
@@ -310,7 +332,7 @@ document.getElementById("metodoPago").addEventListener("change", function () {
 });
 document.addEventListener("DOMContentLoaded", function () {
   const envioForm = document.getElementById("form-envio");
-  const radios = document.getElementsByName("metodo_entrega");
+  const radios = document.getElementsByName("tipo_entrega");
 
   radios.forEach(radio => {
     radio.addEventListener("change", function () {

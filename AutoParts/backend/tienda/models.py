@@ -93,7 +93,12 @@ class Pedido(models.Model):
     envio_domicilio = models.BooleanField( default=False )
     direccion = models.CharField(max_length=225, blank=True, null=True)
     comuna = models.CharField(max_length=100, blank=True, null=True)
+    codigo_comuna_chilexpress = models.CharField(max_length=10, blank=True, null=True)
     region = models.CharField(max_length=100, blank=True, null=True)
+    peso_total = models.FloatField(blank=True, null=True)
+    alto = models.PositiveIntegerField(blank=True, null=True)
+    ancho = models.PositiveIntegerField(blank=True, null=True)
+    largo = models.PositiveIntegerField(blank=True, null=True)
 
     def __str__(self):
         return f"Pedido {self.order_id} - {self.email} - {self.estado}"

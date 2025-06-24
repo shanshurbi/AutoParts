@@ -23,6 +23,8 @@ from transbank.common.integration_type import IntegrationType
 from .models import Pedido, Producto, Vehiculo, Categoria, Carrito, CarritoItem, PerfilUsuario
 from .serializers import ProductoSerializer, VehiculoSerializer, CategoriaSerializer
 from django.contrib.auth import logout
+from .chilexpress import generar_envio_chilexpress
+import requests
 import re, os
 import random
 import string
@@ -621,7 +623,15 @@ def pagar_transbank(request, order_id):
 
     url = response["url"] + "?token_ws=" + response["token"]
     return Response({"url": url})
-
+CODIGOS_COMUNAS = {
+    "Santiago": "13101",
+    "Ñuñoa": "13114",
+    "Providencia": "13115",
+    "Puente Alto": "13201",
+    "La Florida": "13120",
+    "Maipú": "13119",
+    # agrega más según necesites
+}
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def crear_pedido(request):
@@ -631,19 +641,28 @@ def crear_pedido(request):
     email = data.get("email")
     monto = data.get("monto")
     metodo = data.get("metodo_pago")
-    tipo_entrega = data.get("tipo_entrega")  # "retiro" o "envio"
+    tipo_entrega = data.get("tipo_entrega")
 
     if not email or not monto or not metodo or not tipo_entrega:
         return Response({"error": "Faltan datos requeridos"}, status=400)
 
-    # Validación para tipo_entrega
     if tipo_entrega not in ["retiro", "envio"]:
         return Response({"error": "Método de entrega inválido"}, status=400)
 
-    # Generar ID único para Transbank
-    order_id = generar_order_id()
+    # Obtener carrito activo
+    carrito = Carrito.objects.filter(user=user, is_active=True).first()
+    if not carrito:
+        return Response({"error": "No se encontró carrito activo"}, status=400)
 
-    # Crear el pedido
+    items = CarritoItem.objects.filter(carrito=carrito)
+    if not items.exists():
+        return Response({"error": "Carrito vacío"}, status=400)
+
+    # Calcular peso total
+    peso_total = sum(item.producto.peso * item.cantidad for item in items)
+
+    # Crear pedido
+    order_id = generar_order_id()
     pedido = Pedido.objects.create(
         order_id=order_id,
         email=email,
@@ -651,22 +670,20 @@ def crear_pedido(request):
         estado="pendiente",
         retiro_en_tienda=(tipo_entrega == "retiro"),
         envio_domicilio=(tipo_entrega == "envio"),
+        peso_total=peso_total
     )
 
-    # Si es envío, guardar datos adicionales
     if tipo_entrega == "envio":
         pedido.direccion = data.get("direccion")
         pedido.comuna = data.get("comuna")
         pedido.region = data.get("region")
-        telefono = getattr(user.perfilusuario, "telefono", "")
+        pedido.codigo_comuna_chilexpress = CODIGOS_COMUNAS.get(pedido.comuna)
 
-        # Validar que estén todos los campos
-        if not all([pedido.direccion, pedido.comuna, pedido.region, pedido.telefono]):
-            return Response({"error": "Faltan datos de envío"}, status=400)
+        if not all([pedido.direccion, pedido.comuna, pedido.region, pedido.codigo_comuna_chilexpress]):
+            pedido.delete()
+            return Response({"error": "Faltan datos de envío o comuna no válida"}, status=400)
 
-        pedido.save()
-    else:
-        pedido.save()
+    pedido.save()
 
     # Guardar en sesión
     request.session["order_id"] = order_id
@@ -785,3 +802,51 @@ def pago_exitoso(request):
     else:
         messages.error(request, "El pago fue rechazado o anulado. Puedes intentar nuevamente.")
         return redirect("/carrito/")
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def crear_envio(request):
+    pedido_id = request.data.get("pedido_id")
+
+    try:
+        pedido = Pedido.objects.get(order_id=pedido_id)
+    except Pedido.DoesNotExist:
+        return Response({"error": "Pedido no encontrado"}, status=404)
+
+    url = "https://sandbox-api.chilexpress.cl/api/v1/transport-orders"
+    headers = {
+        "Content-Type": "application/json",
+        "x-api-key": "2e0c68cccb5843c98dbe82043be00b59"  # tu API key real
+    }
+
+    payload = {
+        "client_tcc": "123456789",  # tu TCC de prueba o real
+        "reference": pedido.order_id,
+        "origin_commune_code": "13101",  # Santiago
+        "destination_commune_code": pedido.codigo_comuna_chilexpress,
+        "package": {
+            "weight": float(pedido.peso_total),
+            "length": pedido.largo,
+            "width": pedido.ancho,
+            "height": pedido.alto
+        },
+        "content_description": "Pedido generado desde Bastian Autoparts"
+    }
+
+    try:
+        response = requests.post(url, headers=headers, json=payload, timeout=10)
+        response.raise_for_status()  # si la respuesta no es 2xx, lanza excepción
+
+        data = response.json()
+        pedido.ot_codigo = data.get("transport_order_number")
+        pedido.etiqueta_url = data.get("label_url")
+        pedido.save()
+
+        return Response({
+            "ot": pedido.ot_codigo,
+            "etiqueta": pedido.etiqueta_url
+        })
+
+    except requests.exceptions.RequestException as e:
+        return Response({
+            "error": f"No se pudo contactar a Chilexpress: {str(e)}"
+        }, status=502)

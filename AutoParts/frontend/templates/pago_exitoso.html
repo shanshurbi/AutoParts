@@ -49,7 +49,7 @@
         </table>
       </div>
       {% endif %}
-
+      <div id="info-envio" class="mt-4"></div>
       <a href="/" class="btn btn-eliminar">Volver al inicio</a>
     </div>
   </main>
@@ -67,6 +67,44 @@
       });
     }
   });
+  document.addEventListener("DOMContentLoaded", function () {
+  const pedidoId = "{{ order_id }}";  // Asegúrate de que 'order_id' está en el context
+
+  fetch("/api/crear-envio/", {
+    method: "POST",
+    headers: {
+      "Authorization": "Token " + localStorage.getItem("token"),
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ pedido_id: pedidoId })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.ot) {
+      document.getElementById("info-envio").innerHTML = `
+        <div class="alert alert-success">
+          <h5>✅ Envío generado exitosamente</h5>
+          <p><strong>Orden de Transporte:</strong> ${data.ot}</p>
+          <p><a href="${data.etiqueta}" target="_blank">Descargar etiqueta de envío</a></p>
+        </div>
+      `;
+    } else if (data.error) {
+      document.getElementById("info-envio").innerHTML = `
+        <div class="alert alert-warning">
+          <strong>No se pudo generar el envío:</strong> ${data.error}
+        </div>
+      `;
+    }
+  })
+  .catch(err => {
+    console.error("Error al generar envío:", err);
+    document.getElementById("info-envio").innerHTML = `
+      <div class="alert alert-danger">
+        ❌ Error inesperado al generar el envío. Intenta más tarde.
+      </div>
+    `;
+  });
+});
 </script>
 
 </html>
